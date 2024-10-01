@@ -1,10 +1,10 @@
 === iyzico WooCommerce ===
-Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir
+Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir,tarikkamat
 Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico, wordpress ecommerce
-Tested up to: 6.4.3
-Stable tag: 3.4.0
-Requires at least: 4.7
-Requires PHP: 5.4
+Tested up to: 6.6.2
+Stable tag: 3.5.2
+Requires at least: 6.6.2
+Requires PHP: 7.4
 License: LGPL v3.0
 License URI: https://www.gnu.org/licenses/lgpl-3.0.en.html
 
@@ -36,9 +36,9 @@ Check out some of other advantages of iyzico WooCommerce Modul from below;
 
 
 Requirements
-PHP 5.4 and greater.
+PHP 7.4 and greater.
 cURL
-WooCommerce 3.5 requires WordPress 3.5+
+WooCommerce 9.0.0 requires WordPress 6.6.2+
 
 
 == Installation ==
@@ -57,6 +57,11 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 7. Order Management
 
 == Changelog ==
+
+= 3.5.2 =
+  * New : WooCommerce HPOS Support
+  * Fix : PHP functions fixed.
+  * Fix : White page error fixed.
 
 = 3.4.0 =
   * New : WooCommerce Blocks Support
@@ -194,6 +199,11 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 == Upgrade Notice ==
 
 == Changelog ==
+
+= 3.5.2 =
+* Fix : High-Performance Order Storage (HPOS)
+* Fix : PHP8.1 Null Value
+* WooCommerce + Wordpress latest version tested update
 
 = 3.2.6 =
 * New : High-Performance Order Storage (HPOS)
