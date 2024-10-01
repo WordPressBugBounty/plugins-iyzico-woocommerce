@@ -11,7 +11,7 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
     {
 
         $this->id = 'iyzico';
-        $this->iyziV = '3.4.0';
+        $this->iyziV = '3.5.3';
         $this->method_title = __('iyzico Checkout', 'woocommerce-iyzico');
         $this->method_description = __('Best Payment Solution', 'woocommerce-iyzico');
         $this->has_fields = true;
@@ -21,11 +21,11 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->title        = __($this->get_option('title'), 'woocommerce-iyzico');
-        $this->description  = __($this->get_option('description'), 'woocommerce-iyzico');
-        $this->enabled      = $this->get_option('enabled');
-        $this->affiliate    = $this->get_option('affiliate_network');
-        $this->icon         = plugins_url() . IYZICO_PLUGIN_NAME . '/image/cards.png?v=3';
+        $this->title = __($this->get_option('title'), 'woocommerce-iyzico');
+        $this->description = __($this->get_option('description'), 'woocommerce-iyzico');
+        $this->enabled = $this->get_option('enabled');
+        $this->affiliate = $this->get_option('affiliate_network');
+        $this->icon = plugins_url() . IYZICO_PLUGIN_NAME . '/image/cards.png?v=3';
         add_action('init', array(&$this, 'iyzico_response'));
         add_action('admin_init', array($this, 'initIyzicoWebhookUrl'));
         add_action('woocommerce_api_wc_gateway_iyzico', array($this, 'iyzico_response'));
@@ -59,30 +59,30 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
     public function admin_overlay_script()
     {
 
-        $helper                     = new Iyzico_Checkout_For_WooCommerce_Helper();
-        $pkiBuilder                 = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
-        $iyzicoRequest              = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
+        $helper = new Iyzico_Checkout_For_WooCommerce_Helper();
+        $pkiBuilder = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
+        $iyzicoRequest = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
 
-        $apiKey                     = $this->settings['api_key'];
-        $secretKey                  = $this->settings['secret_key'];
-        $baseUrl                    = $this->settings['api_type'];
-        $randNumer                  = rand(100000, 99999999);
+        $apiKey = $this->settings['api_key'];
+        $secretKey = $this->settings['secret_key'];
+        $baseUrl = $this->settings['api_type'];
+        $randNumer = rand(100000, 99999999);
 
         $overlayObject = new stdClass();
-        $overlayObject->locale          = $helper->cutLocale(get_locale());
-        $overlayObject->conversationId  = $randNumer;
-        $overlayObject->position        = $this->settings['overlay_script'];
+        $overlayObject->locale = $helper->cutLocale(get_locale());
+        $overlayObject->conversationId = $randNumer;
+        $overlayObject->position = $this->settings['overlay_script'];
 
-        $pkiString                = $pkiBuilder->pkiStringGenerate($overlayObject);
-        $authorizationData        = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $randNumer);
-
-
-        $iyzicoJson               = json_encode($overlayObject, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-        $requestResponse          = $iyzicoRequest->iyzicoOverlayScriptRequest($baseUrl, $iyzicoJson, $authorizationData);
+        $pkiString = $pkiBuilder->pkiStringGenerate($overlayObject);
+        $authorizationData = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $randNumer);
 
 
-        $iyzicoOverlayToken    = get_option('iyzico_overlay_token');
+        $iyzicoJson = json_encode($overlayObject, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        $requestResponse = $iyzicoRequest->iyzicoOverlayScriptRequest($baseUrl, $iyzicoJson, $authorizationData);
+
+
+        $iyzicoOverlayToken = get_option('iyzico_overlay_token');
         $iyzicoOverlayPosition = get_option('iyzico_overlay_position');
 
 
@@ -145,7 +145,7 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
         $order = wc_get_order($order_id);
 
         return array(
-            'result'   => 'success',
+            'result' => 'success',
             'redirect' => $order->get_checkout_payment_url(true)
         );
     }
@@ -201,61 +201,61 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
 
         global $woocommerce;
 
-        $getOrder                  = new WC_Order($order_id);
-        $customerCart              = $woocommerce->cart->get_cart();
-        $apiKey                    = $this->settings['api_key'];
-        $secretKey                 = $this->settings['secret_key'];
-        $baseUrl                   = $this->settings['api_type'];
-        $language                  = $this->settings['form_language'];
-        $rand                      = rand(1, 99999);
-        $user                      = wp_get_current_user();
-        $iyzicoConversationId      = WC()->session->set('iyzicoConversationId', $order_id);
-        $iyzicoCustomerId          = WC()->session->set('iyzicoCustomerId', $user->ID);
-        $totalAmount               = WC()->session->set('iyzicoOrderTotalAmount', $getOrder->get_total());
+        $getOrder = new WC_Order($order_id);
+        $customerCart = $woocommerce->cart->get_cart();
+        $apiKey = $this->settings['api_key'];
+        $secretKey = $this->settings['secret_key'];
+        $baseUrl = $this->settings['api_type'];
+        $language = $this->settings['form_language'];
+        $rand = rand(1, 99999);
+        $user = wp_get_current_user();
+        $iyzicoConversationId = WC()->session->set('iyzicoConversationId', $order_id);
+        $iyzicoCustomerId = WC()->session->set('iyzicoCustomerId', $user->ID);
+        $totalAmount = WC()->session->set('iyzicoOrderTotalAmount', $getOrder->get_total());
 
 
 
-        $formObjectGenerate        = new Iyzico_Checkout_For_WooCommerce_FormObjectGenerate();
-        $pkiBuilder                = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
-        $iyzicoRequest             = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
+        $formObjectGenerate = new Iyzico_Checkout_For_WooCommerce_FormObjectGenerate();
+        $pkiBuilder = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
+        $iyzicoRequest = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
 
         if ($payMethod != "pwi") {
-            $iyzico                   = $formObjectGenerate->generateOption($customerCart, $language, $getOrder, $apiKey, $this->affiliate);
+            $iyzico = $formObjectGenerate->generateOption($customerCart, $language, $getOrder, $apiKey, $this->affiliate);
         } else {
-            $iyzico                   = $formObjectGenerate->generateOptionPwi($customerCart, $language, $getOrder, $apiKey, $this->affiliate);
+            $iyzico = $formObjectGenerate->generateOptionPwi($customerCart, $language, $getOrder, $apiKey, $this->affiliate);
         }
 
-        $iyzico->buyer            = $formObjectGenerate->generateBuyer($getOrder);
-        $iyzico->shippingAddress  = $formObjectGenerate->generateShippingAddress($getOrder);
-        $iyzico->billingAddress   = $formObjectGenerate->generateBillingAddress($getOrder);
-        $iyzico->basketItems      = $formObjectGenerate->generateBasketItems($customerCart, $getOrder);
+        $iyzico->buyer = $formObjectGenerate->generateBuyer($getOrder);
+        $iyzico->shippingAddress = $formObjectGenerate->generateShippingAddress($getOrder);
+        $iyzico->billingAddress = $formObjectGenerate->generateBillingAddress($getOrder);
+        $iyzico->basketItems = $formObjectGenerate->generateBasketItems($customerCart, $getOrder);
 
         if ($payMethod != "pwi") {
-            $orderObject              = $pkiBuilder->createFormObjectSort($iyzico);
+            $orderObject = $pkiBuilder->createFormObjectSort($iyzico);
         } else {
-            $orderObject              = $pkiBuilder->createFormObjectSortPwi($iyzico);
+            $orderObject = $pkiBuilder->createFormObjectSortPwi($iyzico);
         }
 
-        $pkiString                = $pkiBuilder->pkiStringGenerate($orderObject);
+        $pkiString = $pkiBuilder->pkiStringGenerate($orderObject);
 
-        $authorizationData        = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $rand);
+        $authorizationData = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $rand);
 
-        $iyzicoJson               = json_encode($iyzico, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $iyzicoJson = json_encode($iyzico, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 
 
 
         if ($payMethod != "pwi") {
-            $requestResponse          = $iyzicoRequest->iyzicoCheckoutFormRequest($baseUrl, $iyzicoJson, $authorizationData);
+            $requestResponse = $iyzicoRequest->iyzicoCheckoutFormRequest($baseUrl, $iyzicoJson, $authorizationData);
         } else {
 
-            $requestResponse          = $iyzicoRequest->iyzicoPwiRequest($baseUrl, $iyzicoJson, $authorizationData);
+            $requestResponse = $iyzicoRequest->iyzicoPwiRequest($baseUrl, $iyzicoJson, $authorizationData);
 
             return $requestResponse->payWithIyzicoPageUrl;
         }
 
-        $className                = $this->get_option('form_class');
-        $message =  '<p id="infoBox" style="display:none;">' . $this->settings['payment_checkout_value'] . '</p>';
+        $className = $this->get_option('form_class');
+        $message = '<p id="infoBox" style="display:none;">' . $this->settings['payment_checkout_value'] . '</p>';
 
 
         echo '<script>jQuery(window).on("load", function(){document.getElementById("loadingBar").style.display="none",document.getElementById("infoBox").style.display="block",document.getElementById("iyzipay-checkout-form").style.display="block"});</script>';
@@ -287,12 +287,12 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
                 exit;
             }
 
-            $token           = $_POST['token'];
-            $apiKey          = $this->settings['api_key'];
-            $secretKey       = $this->settings['secret_key'];
-            $baseUrl         = $this->settings['api_type'];
-            $rand            = rand(1, 99999);
-            $conversationId  = "";
+            $token = $_POST['token'];
+            $apiKey = $this->settings['api_key'];
+            $secretKey = $this->settings['secret_key'];
+            $baseUrl = $this->settings['api_type'];
+            $rand = rand(1, 99999);
+            $conversationId = "";
 
             if ($webhook == 'webhook') {
                 $token = $webhookToken;
@@ -300,17 +300,17 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
             }
 
 
-            $iyziModel                  = new Iyzico_Checkout_For_WooCommerce_Model();
+            $iyziModel = new Iyzico_Checkout_For_WooCommerce_Model();
 
-            $responseObjectGenerate    = new Iyzico_Checkout_For_WooCommerce_ResponseObjectGenerate();
-            $pkiBuilder                = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
-            $iyzicoRequest             = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
+            $responseObjectGenerate = new Iyzico_Checkout_For_WooCommerce_ResponseObjectGenerate();
+            $pkiBuilder = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
+            $iyzicoRequest = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
 
-            $tokenDetailObject         = $responseObjectGenerate->generateTokenDetailObject($conversationId, $token);
-            $pkiString                 = $pkiBuilder->pkiStringGenerate($tokenDetailObject);
-            $authorizationData         = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $rand);
-            $tokenDetailObject         = json_encode($tokenDetailObject, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            $requestResponse           = $iyzicoRequest->iyzicoCheckoutFormDetailRequest($baseUrl, $tokenDetailObject, $authorizationData);
+            $tokenDetailObject = $responseObjectGenerate->generateTokenDetailObject($conversationId, $token);
+            $pkiString = $pkiBuilder->pkiStringGenerate($tokenDetailObject);
+            $authorizationData = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $rand);
+            $tokenDetailObject = json_encode($tokenDetailObject, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $requestResponse = $iyzicoRequest->iyzicoCheckoutFormDetailRequest($baseUrl, $tokenDetailObject, $authorizationData);
 
             if (!isset($requestResponse->basketId)) {
                 exit;
@@ -380,17 +380,17 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
                 return wp_redirect($redirectUrl);
             }
 
-            $customerId      = $order->get_customer_id();
-            $orderId         = $requestResponse->basketId;
+            $customerId = $order->get_customer_id();
+            $orderId = $requestResponse->basketId;
 
 
             $iyzicoLocalOrder = new stdClass;
-            $iyzicoLocalOrder->paymentId     = !empty($requestResponse->paymentId) ? (int) $requestResponse->paymentId : '';
-            $iyzicoLocalOrder->orderId       = $orderId;
-            $iyzicoLocalOrder->totalAmount   = !empty($requestResponse->paidPrice) ? (float) $requestResponse->paidPrice : '';
-            $iyzicoLocalOrder->status        = $requestResponse->paymentStatus;
+            $iyzicoLocalOrder->paymentId = !empty($requestResponse->paymentId) ? (int) $requestResponse->paymentId : '';
+            $iyzicoLocalOrder->orderId = $orderId;
+            $iyzicoLocalOrder->totalAmount = !empty($requestResponse->paidPrice) ? (float) $requestResponse->paidPrice : '';
+            $iyzicoLocalOrder->status = $requestResponse->paymentStatus;
 
-            $iyzico_order_insert  = $iyziModel->insertIyzicoOrder($iyzicoLocalOrder);
+            $iyzico_order_insert = $iyziModel->insertIyzicoOrder($iyzicoLocalOrder);
 
 
 
@@ -398,7 +398,7 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
 
                 if ($requestResponse->status == 'success' && $requestResponse->paymentStatus == 'FAILURE') {
 
-                    throw new  \Exception(__("3D security has not been validated for your card.", 'woocommerce-iyzico'));
+                    throw new \Exception(__("3D security has not been validated for your card.", 'woocommerce-iyzico'));
                 }
                 /* Redirect Error */
                 $errorMessage = isset($requestResponse->errorMessage) ? $requestResponse->errorMessage : 'Failed';
@@ -434,7 +434,7 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
                 $orderData = $order->get_data();
                 $orderTotal = $orderData['total'];
 
-                $installment_fee    = $requestResponse->paidPrice - $orderTotal;
+                $installment_fee = $requestResponse->paidPrice - $orderTotal;
 
                 $item_fee = new WC_Order_Item_Fee();
                 $item_fee->set_name($requestResponse->installment . " " . __("Installment Commission", 'woocommerce-iyzico'));
@@ -528,26 +528,26 @@ class Iyzico_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway
         $initInstallWebhookUrl = get_option('init_active_webhook_url');
         $iyzicoWebhookUrlKey = IyzicoWebhook::getIyziUrlId();
         if ($initInstallWebhookUrl == 0) {
-            if (isset($this->settings['api_key']) && isset($this->settings['secret_key'])  && isset($iyzicoWebhookUrlKey) && isset($_SERVER['HTTPS'])) {
+            if (isset($this->settings['api_key']) && isset($this->settings['secret_key']) && isset($iyzicoWebhookUrlKey) && isset($_SERVER['HTTPS'])) {
 
-                $pkiBuilder                 = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
-                $iyzicoRequest              = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
+                $pkiBuilder = new Iyzico_Checkout_For_WooCommerce_PkiBuilder();
+                $iyzicoRequest = new Iyzico_Checkout_For_WooCommerce_iyzicoRequest();
 
-                $apiKey                     = $this->settings['api_key'];
-                $secretKey                  = $this->settings['secret_key'];
-                $baseUrl                    = $this->settings['api_type'];
-                $randNumer                  = rand(100000, 99999999);
+                $apiKey = $this->settings['api_key'];
+                $secretKey = $this->settings['secret_key'];
+                $baseUrl = $this->settings['api_type'];
+                $randNumer = rand(100000, 99999999);
 
                 $setWebhookUrl = new stdClass();
-                $setWebhookUrl->webhookUrl        = get_site_url() . "/wp-json/iyzico/v1/webhook/" . IyzicoWebhook::getIyziUrlId();
+                $setWebhookUrl->webhookUrl = get_site_url() . "/wp-json/iyzico/v1/webhook/" . IyzicoWebhook::getIyziUrlId();
 
-                $pkiString                = $pkiBuilder->pkiStringGenerate($setWebhookUrl);
-                $authorizationData        = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $randNumer);
+                $pkiString = $pkiBuilder->pkiStringGenerate($setWebhookUrl);
+                $authorizationData = $pkiBuilder->authorizationGenerate($pkiString, $apiKey, $secretKey, $randNumer);
 
 
-                $iyzicoJson               = json_encode($setWebhookUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $iyzicoJson = json_encode($setWebhookUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-                $requestResponseWebhook          = $iyzicoRequest->iyzicoPostWebhookUrlKey($baseUrl, $iyzicoJson, $authorizationData);
+                $requestResponseWebhook = $iyzicoRequest->iyzicoPostWebhookUrlKey($baseUrl, $iyzicoJson, $authorizationData);
 
 
 
