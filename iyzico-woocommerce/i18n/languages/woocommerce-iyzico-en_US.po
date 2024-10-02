@@ -199,3 +199,66 @@ msgstr "*Contact to activate webhook "
 
 msgid "Payment Checkout Value"
 msgstr "Payment Checkout Message "
+
+msgid "These payment method settings are made through the admin menu."
+msgstr "These payment method settings are made through the admin menu."
+
+msgid "Click to go to settings."
+msgstr "Click to go to settings."
+
+msgid "Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7."
+msgstr "Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7."
+
+msgid "Save Settings"
+msgstr "Save Settings"
+
+msgid "Permission denied."
+msgstr "Permission denied."
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Checkout Form"
+msgstr "Checkout Form"
+
+msgid "Total Earnings (30 Days)"
+msgstr "Total Earnings (30 Days)"
+
+msgid "Growth from Last Month"
+msgstr "Growth from Last Month"
+
+msgid "Total Orders (30 Days)"
+msgstr "Total Orders (30 Days)"
+
+msgid "Last 30 Days Earnings"
+msgstr "Last 30 Days Earnings"
+
+msgid "Growth Compared to Last Month"
+msgstr "Growth Compared to Last Month"
+
+msgid "Number of Orders in the Last 30 Days"
+msgstr "Number of Orders in the Last 30 Days"
+
+msgid "This order will be processed on the iyzico payment page."
+msgstr "This order will be processed on the iyzico payment page."
+
+msgid "Token Not Found"
+msgstr "Token Not Found"
+
+msgid "Payment token is missing. Please try again or contact the store owner if the problem persists."
+msgtr "Payment token is missing. Please try again or contact the store owner if the problem persists."
+
+msgid "Payment process failed. Please try again or choose a different payment method."
+msgstr "Payment process failed. Please try again or choose a different payment method."
+
+msgid "An unknown error occurred during the payment process. Please try again."
+msgstr "An unknown error occurred during the payment process. Please try again."
+
+msgid "Currently in the process of applying for a shopping loan."
+msgstr "Currently in the process of applying for a shopping loan."
+
+msgid "The shopping credit transaction has been initiated."
+msgstr "The shopping credit transaction has been initiated."
+
+msgid "Refunded %s"
+msgstr "Refunded %s"

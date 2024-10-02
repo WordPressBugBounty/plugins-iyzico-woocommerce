@@ -3,6 +3,8 @@
 namespace Iyzico\IyzipayWoocommerce\Pwi;
 
 use Exception;
+use Iyzico\IyzipayWoocommerce\Common\Helpers\RefundProcessor;
+use WC_Payment_Gateway;
 use Iyzico\IyzipayWoocommerce\Checkout\CheckoutSettings;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\CookieManager;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\DataFactory;
@@ -12,12 +14,11 @@ use Iyzico\IyzipayWoocommerce\Common\Helpers\PriceHelper;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\TlsVerifier;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\VersionChecker;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
-use Iyzipay\Model\PayWithIyzicoInitialize;
 use Iyzipay\Options;
+use Iyzipay\Model\PayWithIyzicoInitialize;
 use Iyzipay\Request\CreatePayWithIyzicoInitializeRequest;
-use WC_Payment_Gateway_CC;
 
-class Pwi extends WC_Payment_Gateway_CC {
+class Pwi extends WC_Payment_Gateway {
 
 	public $pwiSettings;
 	public $order;
@@ -31,7 +32,7 @@ class Pwi extends WC_Payment_Gateway_CC {
 	public $checkoutSettings;
 	public $pwiDataFactory;
 	public $paymentProcessor;
-
+	public $refundProcessor;
 
 	public function __construct() {
 		$this->id                 = "pwi";
@@ -71,7 +72,8 @@ class Pwi extends WC_Payment_Gateway_CC {
 			$this->databaseManager
 		);
 
-		$this->pwiDataFactory = new DataFactory( $this->priceHelper, $this->checkoutSettings );
+		$this->pwiDataFactory  = new DataFactory( $this->priceHelper, $this->checkoutSettings );
+		$this->refundProcessor = new RefundProcessor();
 	}
 
 	public function process_payment( $order_id ) {
@@ -86,6 +88,10 @@ class Pwi extends WC_Payment_Gateway_CC {
 		} catch ( Exception $e ) {
 			wc_add_notice( $e->getMessage(), 'error' );
 		}
+	}
+
+	public function process_refund( $order_id, $amount = null, $reason = '' ) {
+		return $this->refundProcessor->refund( $order_id, $amount );
 	}
 
 	protected function create_payment( $orderId ) {
@@ -107,7 +113,7 @@ class Pwi extends WC_Payment_Gateway_CC {
 
 		// Payment Source Settings
 		$affiliate     = $this->checkoutSettings->findByKey( 'affiliate_network' );
-		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-PWI-3.5.2";
+		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-PWI-3.5.5";
 
 		if ( strlen( $affiliate ) > 0 ) {
 			$paymentSource = "$paymentSource|$affiliate";

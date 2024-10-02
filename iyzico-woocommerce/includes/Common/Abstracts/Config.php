@@ -54,7 +54,7 @@ abstract class Config
 					'title' => __('Pay with Bank/Debit Card', 'woocommerce-iyzico'),
 					'button_text' => __('Pay With Card', 'woocommerce-iyzico'),
 					'description' => __('Pay with your credit card or debit card via iyzico.', 'woocommerce-iyzico'),
-					'icon' => PLUGIN_ASSETS_DIR_URL . '/images/cards.png',
+					'icon' => PLUGIN_ASSETS_DIR_URL . '/images/cards_v2.png',
 					'success_status' => 'processing',
 					'overlay_script' => 'left',
 					'form_class' => 'popup',
@@ -64,6 +64,7 @@ abstract class Config
 				),
 				'woocommerce_pwi_settings' => array(
 					'enabled' => 'yes',
+					'icon' => PLUGIN_ASSETS_DIR_URL . '/images/iyzico.png',
 					'title' => __('Pay with iyzico', 'woocommerce-iyzico'),
 					'button_text' => __('Pay with iyzico', 'woocommerce-iyzico'),
 					'description' => __("Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7.", 'woocommerce-iyzico'),

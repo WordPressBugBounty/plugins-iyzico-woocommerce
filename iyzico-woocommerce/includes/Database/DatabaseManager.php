@@ -104,6 +104,44 @@ class DatabaseManager {
 		return $sql;
 	}
 
+	/**
+	 * @param $paymentId * iyzico Response PaymentId
+	 * @param $orderId * WooCommerce OrderId
+	 * @param $totalAmount * Order Total Amount
+	 * @param $status * Order Status
+	 *
+	 * @return mixed
+	 */
+	public static function createOrder( $paymentId, $orderId, $totalAmount, $status ) {
+		self::ensureInitialized();
+		$tableName = self::$wpdb->prefix . 'iyzico_order';
+
+		return self::$wpdb->insert(
+			$tableName,
+			[
+				'payment_id'   => $paymentId,
+				'order_id'     => $orderId,
+				'total_amount' => $totalAmount,
+				'status'       => $status
+			],
+			[ '%s', '%d', '%f', '%s' ]
+		);
+	}
+
+	public static function findOrderByOrderId( $orderId ) {
+		self::ensureInitialized();
+		$tableName = self::$wpdb->prefix . 'iyzico_order';
+
+		$sql = self::$wpdb->prepare( "
+			SELECT *
+			FROM $tableName
+			WHERE order_id = %d
+			ORDER BY iyzico_order_id DESC LIMIT 1;
+		", $orderId );
+
+		return self::$wpdb->get_row( $sql, ARRAY_A );
+	}
+
 	public function findUserCardKey( $customerId, $apiKey ) {
 		$tableName = self::$wpdb->prefix . 'iyzico_card';
 		$fieldName = 'card_user_key';

@@ -7,9 +7,6 @@ use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 class WebhookHelper
 {
 	private $checkoutSettings;
-	private $paymentConversationId;
-	private $token;
-	private $iyziEventType;
 	private $status;
 	private $paymentProcessor;
 	private $logger;

@@ -211,3 +211,69 @@ msgstr ""
 
 msgid "Payment Checkout Value"
 msgstr "Ödeme Ekran Mesajı"
+
+msgid "These payment method settings are made through the admin menu."
+msgstr "Bu ödeme yöntemi ayarları yönetici menüsünden yapılmaktadır."
+
+msgid "Click to go to settings."
+msgstr "Ayarlar için tıklayınız."
+
+msgid "Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7."
+msgstr "iyzico ile Öde-Şimdi Kolay! Alışverişini ister iyzico bakiyenle, ister saklı kartınla, ister havale/EFT yöntemi ile kolayca öde; aklına takılan herhangi bir konuda iyzico Korumalı Alışveriş avantajıyla 7/24 canlı destek al."
+
+msgid "Save Settings"
+msgstr "Ayarları Kaydet"
+
+msgid "Permission denied."
+msgstr "İzin reddedildi."
+
+msgid "Error"
+msgstr "Hata"
+
+msgid "Checkout Form"
+msgstr "Ödeme Formu"
+
+msgid "Total Earnings (30 Days)"
+msgstr "Toplam Kazanç (30 Günlük)"
+
+msgid "Growth from Last Month"
+msgstr "Geçen Aya Göre Büyüme"
+
+msgid "Total Orders (30 Days)"
+msgstr "Toplam Sipariş (30 Günlük)"
+
+msgid "Last 30 Days Earnings"
+msgstr "Son 30 Günlük Kazanç"
+
+msgid "Growth Compared to Last Month"
+msgstr "Geçen Aya Göre Büyüme"
+
+msgid "Number of Orders in the Last 30 Days"
+msgstr "Son 30 Gündeki Sipariş Sayısı"
+
+msgid "This order will be processed on the iyzico payment page."
+msgstr "Bu sipariş, iyzico ödeme sayfasında işleme alınacaktır."
+
+msgid "Token Not Found"
+msgstr "Üzgünüm, bir terslik oluştu. Token değeri olmadığından işlemine devam edilemedi."
+
+msgid "Payment token is missing. Please try again or contact the store owner if the problem persists."
+msgstr "Ödemeye ait token bulunamadı. Lütfen tekrar deneyin veya mağaza sahibi ile iletişime geçiniz."
+
+msgid "Payment process failed. Please try again or choose a different payment method."
+msgstr "Ödeme işleme hatası. Lütfen tekrar deneyin veya farklı ödeme seçeneği tekrar deneyiniz."
+
+msgid "An unknown error occurred during the payment process. Please try again."
+msgstr "Ödeme işlemi sırasında bilinmeyen bir hata oluştu. Lütfen tekrar deneyin."
+
+msgid "Currently in the process of applying for a shopping loan."
+msgstr "Alışveriş kredisi başvurusu sürecindedir."
+
+msgid "The shopping loan transaction was completed successfully."
+msgstr "Alışveriş kredisi işlemi başarıyla tamamlandı."
+
+msgid "The shopping credit transaction has been initiated."
+msgstr "Alışveriş kredisi işlemi başlatıldı."
+
+msgid "Refunded %s"
+msgstr "İade edildi %s"

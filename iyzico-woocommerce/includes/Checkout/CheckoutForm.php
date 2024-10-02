@@ -3,6 +3,8 @@
 namespace Iyzico\IyzipayWoocommerce\Checkout;
 
 use Exception;
+use Iyzico\IyzipayWoocommerce\Common\Helpers\RefundProcessor;
+use WC_Payment_Gateway;
 use Iyzico\IyzipayWoocommerce\Admin\SettingsPage;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\CookieManager;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\DataFactory;
@@ -12,16 +14,13 @@ use Iyzico\IyzipayWoocommerce\Common\Helpers\PriceHelper;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\TlsVerifier;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\VersionChecker;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
-use Iyzipay\Model\CheckoutFormInitialize;
 use Iyzipay\Options;
-use Iyzipay\Request\CreateCheckoutFormInitializeRequest;
-
-use WC_Payment_Gateway_CC;
-
-use Iyzipay\Request\RetrieveProtectedOverleyScriptRequest;
+use Iyzipay\Model\CheckoutFormInitialize;
 use Iyzipay\Model\ProtectedOverleyScript;
+use Iyzipay\Request\CreateCheckoutFormInitializeRequest;
+use Iyzipay\Request\RetrieveProtectedOverleyScriptRequest;
 
-class CheckoutForm extends WC_Payment_Gateway_CC {
+class CheckoutForm extends WC_Payment_Gateway {
 
 	public $checkoutSettings;
 	public $order;
@@ -38,6 +37,7 @@ class CheckoutForm extends WC_Payment_Gateway_CC {
 	public $checkoutView;
 	public $adminSettings;
 	public $databaseManager;
+	public $refundProcessor;
 
 	public function __construct() {
 		$this->id                 = "iyzico";
@@ -79,6 +79,7 @@ class CheckoutForm extends WC_Payment_Gateway_CC {
 		$this->checkoutDataFactory = new DataFactory( $this->priceHelper, $this->checkoutSettings );
 		$this->checkoutView        = new CheckoutView( $this->checkoutSettings );
 		$this->adminSettings       = new SettingsPage();
+		$this->refundProcessor     = new RefundProcessor();
 	}
 
 	public function admin_overlay_script() {
@@ -107,6 +108,10 @@ class CheckoutForm extends WC_Payment_Gateway_CC {
 			$this->paymentProcessor->processCallback();
 			exit;
 		}
+	}
+
+	public function process_refund( $order_id, $amount = null, $reason = '' ) {
+		return $this->refundProcessor->refund( $order_id, $amount );
 	}
 
 	public function process_payment( $order_id ) {
@@ -153,7 +158,7 @@ class CheckoutForm extends WC_Payment_Gateway_CC {
 
 		// Payment Source Settings
 		$affiliate     = $this->checkoutSettings->findByKey( 'affiliate_network' );
-		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.2";
+		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.5";
 
 		if ( strlen( $affiliate ) > 0 ) {
 			$paymentSource = "$paymentSource|$affiliate";

@@ -1,8 +1,8 @@
 === iyzico WooCommerce ===
 Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir,tarikkamat
-Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico, wordpress ecommerce
+Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico
 Tested up to: 6.6.2
-Stable tag: 3.5.3
+Stable tag: 3.5.5
 Requires at least: 6.6.2
 Requires PHP: 7.4
 License: LGPL v3.0
@@ -58,17 +58,23 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 
 == Changelog ==
 
-= 3.5.3 =
-  * Dev : WooCommerce HPOS Support
+= 3.5.5 =
+  * New : WooCommerce HPOS Support
+  * New : Refund Support
+  * Fix : PHP functions fixed.
+  * Fix : White page error fixed.
+
 
 = 3.5.2 =
   * New : WooCommerce HPOS Support
   * Fix : PHP functions fixed.
   * Fix : White page error fixed.
 
-= 3.5.3 =
+
+= 3.4.0 =
   * New : WooCommerce Blocks Support
   * Fix : PHP end() functions fixed.
+
 
 = 3.2.6 =
   * New : High-Performance Order Storage (HPOS)
@@ -203,8 +209,11 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 
 == Changelog ==
 
-= 3.5.3 =
-* Dev : High-Performance Order Storage (HPOS)
+= 3.5.5 =
+* Fix : Refund Support
+* Fix : High-Performance Order Storage (HPOS)
+* Fix : PHP8.1 Null Value
+* WooCommerce + Wordpress latest version tested update
 
 = 3.5.2 =
 * Fix : High-Performance Order Storage (HPOS)

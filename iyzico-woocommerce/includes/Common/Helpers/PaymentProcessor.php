@@ -7,6 +7,7 @@ use Iyzico\IyzipayWoocommerce\Checkout\CheckoutSettings;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 use Iyzipay\Model\CheckoutForm as CheckoutFormModel;
 use Iyzipay\Model\Mapper\CheckoutFormMapper;
+use Iyzipay\Options;
 use Iyzipay\Request\RetrieveCheckoutFormRequest;
 use WC_Data_Exception;
 use WC_Order;
@@ -61,13 +62,13 @@ class PaymentProcessor
 			$this->saveCardFamily($checkoutFormResult, $order);
 			$this->saveLastFourDigits($checkoutFormResult, $order);
 			$this->updateOrder($checkoutFormResult, $order);
-			$this->redirectToOrderReceived($order);
+			$this->saveOrder($checkoutFormResult, $order);
+			$this->redirectToOrderReceived($checkoutFormResult, $order);
 
 		} catch (Exception $e) {
 			$this->handleException($e);
 		}
 	}
-
 
 	public function processWebhook($response)
 	{
@@ -83,6 +84,7 @@ class PaymentProcessor
 				$orderMessage = __("Currently in the process of applying for a shopping loan.", "woocommerce-iyzico");
 				$order->add_order_note($orderMessage, 0, true);
 				$order->update_status("on-hold");
+
 				return http_response_code(200);
 			}
 
@@ -90,6 +92,7 @@ class PaymentProcessor
 				$orderMessage = __("The shopping loan transaction was completed successfully.", "woocommerce-iyzico");
 				$order->add_order_note($orderMessage, 0, true);
 				$order->update_status("processing");
+
 				return http_response_code(200);
 			}
 
@@ -97,6 +100,7 @@ class PaymentProcessor
 				$orderMessage = __("The shopping credit transaction has been initiated.", "woocommerce-iyzico");
 				$order->add_order_note($orderMessage, 0, true);
 				$order->update_status("on-hold");
+
 				return http_response_code(200);
 			}
 
@@ -239,14 +243,9 @@ class PaymentProcessor
 		}
 	}
 
-	private function isPaymentSuccessful($checkoutFormResult): bool
-	{
-		return $checkoutFormResult->getPaymentStatus() === 'SUCCESS';
-	}
-
 	private function updateOrder($checkoutFormResult, WC_Order $order): void
 	{
-		if ($checkoutFormResult->getPaymentStatus() === 'SUCCESS') {
+		if ($checkoutFormResult->getPaymentStatus() === 'SUCCESS' && $checkoutFormResult->getStatus() === 'success') {
 			$order->payment_complete();
 			$order->save();
 
@@ -286,25 +285,43 @@ class PaymentProcessor
 		}
 	}
 
-	private function redirectToOrderReceived(WC_Order $order): void
+	private function saveOrder($checkoutFormResult, WC_Order $order)
 	{
-		$checkoutOrderUrl = $order->get_checkout_order_received_url();
-		$redirectUrl = add_query_arg([
-			'msg' => 'Thank You',
-			'type' => 'woocommerce-message'
-		], $checkoutOrderUrl);
+		if ($checkoutFormResult->getStatus() === "success") {
 
-		wp_redirect($redirectUrl);
-		exit;
+			$orderId = $order->get_id();
+			$checkoutFormResult->getPaymentId();
+			$totalAmount = $checkoutFormResult->getPaidPrice();
+			$status = $checkoutFormResult->getStatus();
+
+			$this->databaseManager->createOrder(
+				$checkoutFormResult->getPaymentId(),
+				$orderId,
+				$totalAmount,
+				$status
+			);
+
+		}
+
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	private function handlePaymentFailure(WC_Order $order, string $errorMessage): void
+	private function redirectToOrderReceived($checkoutFormResult, WC_Order $order): void
 	{
-		$order->add_order_note($errorMessage);
-		throw new Exception($errorMessage);
+		if ($checkoutFormResult->getStatus() === "success" && $checkoutFormResult->getPaymentStatus() !== "FAILURE") {
+			$checkoutOrderUrl = $order->get_checkout_order_received_url();
+			$redirectUrl = add_query_arg([
+				'msg' => 'Thank You',
+				'type' => 'woocommerce-message'
+			], $checkoutOrderUrl);
+
+			wp_redirect($redirectUrl);
+			exit;
+		}
+
+		throw new Exception(__("Error", "woocommerce-iyzico"));
 	}
 
 	private function handleException(Exception $e): void
@@ -315,9 +332,9 @@ class PaymentProcessor
 		exit;
 	}
 
-	protected function createOptions(): \Iyzipay\Options
+	protected function createOptions(): Options
 	{
-		$options = new \Iyzipay\Options();
+		$options = new Options();
 		$options->setApiKey($this->checkoutSettings->findByKey('api_key'));
 		$options->setSecretKey($this->checkoutSettings->findByKey('secret_key'));
 		$options->setBaseUrl($this->checkoutSettings->findByKey('api_type'));
