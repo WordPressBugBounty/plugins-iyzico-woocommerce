@@ -61,7 +61,20 @@ class DataFactory {
 		return $address;
 	}
 
-	protected function createBasket( array $cart ): array {
+	protected function createBasket( WC_Order $order, array $cart ): array {
+		$basketItems             = [];
+		$isShippingPriceIncluded = $this->orderHasShippingPrice( $order );
+
+		if ( $isShippingPriceIncluded ) {
+			$shippingItem = new BasketItem();
+			$shippingItem->setId( 'SHIPPING' );
+			$shippingItem->setName( 'Shipping' );
+			$shippingItem->setCategory1( 'Shipping' );
+			$shippingItem->setItemType( BasketItemType::PHYSICAL );
+			$shippingItem->setPrice( $this->priceHelper->priceParser( $order->get_shipping_total() ) );
+			$basketItems[] = $shippingItem;
+		}
+
 		foreach ( $cart as $item ) {
 			$product    = $item['data'];
 			$basketItem = new BasketItem();
@@ -73,7 +86,7 @@ class DataFactory {
 				$category_names = wp_list_pluck( $categories, 'name' );
 				$basketItem->setCategory1( implode( ', ', $category_names ) );
 			} else {
-				$basketItem->setCategory1('UNKNOWN');
+				$basketItem->setCategory1( 'UNKNOWN' );
 			}
 
 			$basketItem->setItemType( $product->is_virtual() ? BasketItemType::VIRTUAL : BasketItemType::PHYSICAL );
@@ -90,7 +103,7 @@ class DataFactory {
 			'buyer'           => $this->createBuyer( $customer, $order ),
 			'billingAddress'  => $this->createAddress( $order, 'billing' ),
 			'shippingAddress' => $this->createAddress( $order, 'shipping' ),
-			'basketItems'     => $this->createBasket( $cart ),
+			'basketItems'     => $this->createBasket( $order, $cart ),
 		];
 
 		if ( ! $cartHasPhysicalProduct ) {
@@ -109,5 +122,9 @@ class DataFactory {
 		}
 
 		return false;
+	}
+
+	protected function orderHasShippingPrice( WC_Order $order ): bool {
+		return $order->get_shipping_total() > 0;
 	}
 }

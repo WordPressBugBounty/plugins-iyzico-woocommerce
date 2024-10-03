@@ -158,7 +158,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 
 		// Payment Source Settings
 		$affiliate     = $this->checkoutSettings->findByKey( 'affiliate_network' );
-		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.6";
+		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.7";
 
 		if ( strlen( $affiliate ) > 0 ) {
 			$paymentSource = "$paymentSource|$affiliate";

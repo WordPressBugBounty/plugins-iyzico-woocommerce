@@ -6,7 +6,7 @@
  * Description: iyzico Payment Gateway for WooCommerce.
  * Author: iyzico
  * Author URI: https://iyzico.com
- * Version: 3.5.6
+ * Version: 3.5.7
  * Requires Plugins: woocommerce
  * Requires at least: 6.6.2
  * Tested up to: 6.6.2
@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * These constants are used to define the plugin version, base file, path, url and language path.
  */
-const PLUGIN_VERSION  = '3.5.6';
+const PLUGIN_VERSION  = '3.5.7';
 const PLUGIN_BASEFILE = __FILE__;
 
 define( 'PLUGIN_PATH', untrailingslashit( plugin_dir_path( PLUGIN_BASEFILE ) ) );

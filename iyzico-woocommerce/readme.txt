@@ -2,9 +2,9 @@
 Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir,tarikkamat
 Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico
 Tested up to: 6.6.2
-Stable tag: 3.5.6
+Stable tag: 3.5.7
 Requires at least: 6.6.2
-Requires PHP: 7.4
+Requires PHP: 8.0
 License: LGPL v3.0
 License URI: https://www.gnu.org/licenses/lgpl-3.0.en.html
 
@@ -36,7 +36,7 @@ Check out some of other advantages of iyzico WooCommerce Modul from below;
 
 
 Requirements
-PHP 7.4 and greater.
+PHP 8.0 and greater.
 cURL
 WooCommerce 9.0.0 requires WordPress 6.6.2+
 
@@ -57,6 +57,10 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 7. Order Management
 
 == Changelog ==
+
+= 3.5.7 =
+  * Fix : The amount sent must be equal to the total amount of all breakdowns
+  * WooCommerce + Wordpress latest version tested update
 
 = 3.5.6 =
   * New : Payment Request Log Added iyzico-wocommerce/log_files
@@ -207,6 +211,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 == Upgrade Notice ==
 
 == Changelog ==
+
+= 3.5.7 =
+* Fix : The amount sent must be equal to the total amount of all breakdowns
 
 = 3.5.6 =
 * Fix : basketItemCategory1 is a mandatory parameter error fixed.

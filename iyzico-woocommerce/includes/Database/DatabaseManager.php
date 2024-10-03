@@ -35,11 +35,31 @@ class DatabaseManager {
 		try {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
-			$tables = self::getTableDefinitions();
-			foreach ( $tables as $table_name => $columns ) {
-				$sql = self::generateCreateTableSQL( $table_name, $columns );
-				dbDelta( $sql );
-			}
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'iyzico_order';
+			$table_name2 = $wpdb->prefix . 'iyzico_card';
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql = "CREATE TABLE $table_name (
+                iyzico_order_id int(11) NOT NULL AUTO_INCREMENT,
+                payment_id  bigint(11) NOT NULL,
+                order_id int(11) NOT NULL,
+                total_amount decimal( 10, 2 ) NOT NULL,
+                status varchar(20) NOT NULL,
+                created_at  timestamp DEFAULT current_timestamp,
+              PRIMARY KEY (iyzico_order_id)
+            ) $charset_collate;";
+			dbDelta( $sql );
+
+			$sql = "CREATE TABLE $table_name2 (
+                iyzico_card_id int(11) NOT NULL AUTO_INCREMENT,
+                customer_id INT(11) NOT NULL,
+                card_user_key varchar(50) NOT NULL,
+                api_key varchar(50) NOT NULL,
+                created_at  timestamp DEFAULT current_timestamp,
+               PRIMARY KEY (iyzico_card_id)
+            ) $charset_collate;";
+			dbDelta($sql);
 
 			self::$logger->info( 'Tables created successfully' );
 		} catch ( Exception $e ) {
@@ -50,12 +70,21 @@ class DatabaseManager {
 	public static function dropTables(): void {
 		self::ensureInitialized();
 		try {
-			$tables = self::getTableDefinitions();
-			foreach ( $tables as $table_name => $columns ) {
-				$sql = "DROP TABLE IF EXISTS " . self::$wpdb->prefix . $table_name . ";";
-				self::$wpdb->query( $sql );
-			}
+			global $wpdb;
+			delete_option('iyzico_overlay_token');
+			delete_option('iyzico_overlay_position');
+			delete_option('iyzico_thank_you');
+			delete_option('init_active_webhook_url');
 
+			$table_name = $wpdb->prefix . 'iyzico_order';
+			$table_name2 = $wpdb->prefix . 'iyzico_card';
+
+			$sql = "DROP TABLE IF EXISTS $table_name;";
+			$wpdb->query($sql);
+			$sql = "DROP TABLE IF EXISTS $table_name2;";
+			$wpdb->query($sql);
+			flush_rewrite_rules();
+			
 			self::$logger->info( 'Tables dropped successfully' );
 		} catch ( Exception $e ) {
 			self::$logger->error( 'Error dropping tables: ' . $e->getMessage() );

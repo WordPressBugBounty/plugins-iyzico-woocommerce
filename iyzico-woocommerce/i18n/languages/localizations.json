@@ -61,6 +61,7 @@
       "save": "Kaydet"
     },
     "settings": {
+      "message": "Log dosyanızı wp-content/plugins/iyzico-woocommerce/log_files dizininde bulabilirsiniz.",
       "title": "Genel Ayarlar",
       "description": "Bu kısımdan iyzico hesabınızı bağlayabilir ve ödeme ayarlarınızı yönetebilirsiniz.",
       "success": "Başarılı!",
@@ -206,6 +207,7 @@
       "save": "Save"
     },
     "settings": {
+      "message": "You can find your log file in the wp-content/plugins/iyzico-woocommerce/log_files directory.",
       "title": "General Settings",
       "description": "You can connect your iyzico account and manage your payment settings from this section.",
       "success": "Successfully!",

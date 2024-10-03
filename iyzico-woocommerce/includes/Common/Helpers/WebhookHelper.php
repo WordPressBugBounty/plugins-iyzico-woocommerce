@@ -15,6 +15,10 @@ class WebhookHelper {
 	private $versionChecker;
 	private $tlsVerifier;
 	private $databaseManager;
+	private $paymentConversationId;
+	private $token;
+	private $iyziEventType;
+
 
 	public function __construct() {
 		$this->logger           = new Logger();
@@ -34,6 +38,20 @@ class WebhookHelper {
 			$this->checkoutSettings,
 			$this->databaseManager
 		);
+
+		$this->namespace     = 'iyzico/v1';
+		$this->resource_name = 'webhook/' . self::getIyziUrlId();
+	}
+
+	public static function getIyziUrlId() {
+
+		if ( ! get_option( WEBHOOK_URL_KEY ) ) {
+			add_action( 'admin_notices', [ self::class, 'webhookAdminNoticeWarning' ] );
+
+			return;
+		} else {
+			return get_option( WEBHOOK_URL_KEY );
+		}
 	}
 
 	private function get_rest_url( $route ): string {
@@ -51,56 +69,55 @@ class WebhookHelper {
 		register_rest_route( 'iyzico/v1', "/webhook/{$webhookID}", [
 			'methods'             => 'POST',
 			'callback'            => [ $this, 'processWebhook' ],
-			'permission_callback' => [ $this, 'verifyWebhook' ]
+			'permission_callback' => '__return_true',
 		] );
 	}
 
-	public function verifyWebhook( $request ) {
-		$signature     = $request->get_header( 'X-IYZ-SIGNATURE' );
-		$iyziEventType = $request->get_header( 'iyziEventType' );
-
-		$body = $request->get_json_params();
-
-		if ( $signature && $iyziEventType && isset( $body['token'] ) ) {
-			return $this->validateSignature( $signature, $iyziEventType, $body['token'] );
-		}
-
-		return false;
-	}
-
-	private function validateSignature( $receivedSignature, $eventType, $token ) {
-		$secretKey = $this->checkoutSettings->findByKey( 'secret_key' );
-
-		if ( ! $secretKey ) {
-			error_log( 'iyzico secret key not found' );
-
-			return false;
-		}
-
-		$stringToBeHashed = $secretKey . $eventType . $token;
-		$hash             = base64_encode( sha1( $stringToBeHashed, true ) );
-
-		return hash_equals( $hash, $receivedSignature );
-	}
-
 	public function processWebhook( $request ) {
-		$params       = wp_parse_args( $request->get_json_params() );
-		$this->status = $params['status'];
+		$headers         = getallheaders();
+		$iyzicoSignature = $headers['X-IYZ-SIGNATURE'];
 
-		if ( $this->status === 'SUCCESS' ) {
-			return $this->handleSuccessfulPayment( $params );
+		if ( is_null( $iyzicoSignature ) ) {
+			$iyzicoSignature = $headers['X-Iyz-Signature'];
+		}
+
+		if ( is_null( $iyzicoSignature ) ) {
+			$iyzicoSignature = $headers['x-iyz-signature'];
+		}
+
+		if ( is_null( $iyzicoSignature ) ) {
+			$iyzicoSignature = $headers['x_iyz_signature'];
+		}
+
+		$params = wp_parse_args( $request->get_json_params() );
+
+		if ( isset( $params['iyziEventType'] ) && isset( $params['token'] ) && isset( $params['paymentConversationId'] ) ) {
+			$this->paymentConversationId = $params['paymentConversationId'];
+			$this->token                 = $params['token'];
+			$this->iyziEventType         = $params['iyziEventType'];
+
+			if ( $iyzicoSignature ) {
+				$createIyzicoSignature = base64_encode( sha1( $this->checkoutSettings->findByKey( 'secret_key' ) . $this->iyziEventType . $this->token, true ) );
+				if ( $iyzicoSignature == $createIyzicoSignature ) {
+					$params = [
+						'iyziEventType'         => $this->iyziEventType,
+						'token'                 => $this->token,
+						'paymentConversationId' => $this->paymentConversationId,
+					];
+
+					return $this->handleSuccessfulPayment( $params );
+				} else {
+					return new \WP_Error( 'signature_not_valid', 'X-IYZ-SIGNATURE geçersiz', array( 'status' => 404 ) );
+				}
+			} else {
+				return new \WP_Error( 'signature_not_found', 'X-IYZ-SIGNATURE bulunamadı', array( 'status' => 404 ) );
+			}
 		} else {
-			return $this->handleFailedPayment( $params );
+			return new \WP_Error( 'invalid_parameters', 'Gönderilen parametreler geçersiz', array( 'status' => 404 ) );
 		}
 	}
 
 	private function handleSuccessfulPayment( $data ) {
 		return $this->paymentProcessor->processWebhook( $data );
-	}
-
-	private function handleFailedPayment( $data ) {
-		$this->paymentProcessor->processWebhook( $data );
-
-		return new \WP_Error( 'payment_failed', 'Payment failed', [ 'status' => 400 ] );
 	}
 }
