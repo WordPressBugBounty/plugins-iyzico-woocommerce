@@ -246,7 +246,7 @@ msgid "Token Not Found"
 msgstr "Token Not Found"
 
 msgid "Payment token is missing. Please try again or contact the store owner if the problem persists."
-msgtr "Payment token is missing. Please try again or contact the store owner if the problem persists."
+msgstr "Payment token is missing. Please try again or contact the store owner if the problem persists."
 
 msgid "Payment process failed. Please try again or choose a different payment method."
 msgstr "Payment process failed. Please try again or choose a different payment method."

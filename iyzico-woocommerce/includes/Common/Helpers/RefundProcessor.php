@@ -10,52 +10,51 @@ use Iyzipay\Model\AmountBaseRefund;
 use Iyzipay\Options;
 use Iyzipay\Request\AmountBaseRefundRequest;
 
-class RefundProcessor
-{
+class RefundProcessor {
 	private Logger $logger;
 	private DatabaseManager $databaseManager;
 	private PriceHelper $priceHelper;
 	private CheckoutSettings $checkoutSettings;
 
-	public function __construct()
-	{
-		$this->logger = new Logger();
-		$this->databaseManager = new DatabaseManager();
-		$this->priceHelper = new PriceHelper();
+	public function __construct() {
+		$this->logger           = new Logger();
+		$this->databaseManager  = new DatabaseManager();
+		$this->priceHelper      = new PriceHelper();
 		$this->checkoutSettings = new CheckoutSettings();
 	}
 
-	public function refund($orderId, $amount)
-	{
-		$order = $this->getOrderByOrderId($orderId);
+	public function refund( $orderId, $amount ) {
+		$order = $this->getOrderByOrderId( $orderId );
 
-		if (is_null($order)) {
-			$this->logger->error('RefundProcessor: Order not found for order id ' . $orderId);
+		if ( is_null( $order ) ) {
+			$this->logger->error( 'RefundProcessor: Order not found for order id ' . $orderId );
+
 			return false;
 		}
 
 		$paymentId = $order['payment_id'];
 
-		if (is_null($amount)) {
+		if ( is_null( $amount ) ) {
 			$amount = $order['total_amount'];
 		}
 
 		$options = $this->create_options();
 
 		$request = new AmountBaseRefundRequest();
-		$request->setPaymentId($paymentId);
-		$request->setPrice($this->priceHelper->priceParser($amount));
-		$request->setIp($_SERVER['REMOTE_ADDR']);
+		$request->setPaymentId( $paymentId );
+		$request->setPrice( $this->priceHelper->priceParser( $amount ) );
+		$request->setIp( $_SERVER['REMOTE_ADDR'] );
 
-		$response = AmountBaseRefund::create($request, $options);
+		$response = AmountBaseRefund::create( $request, $options );
 
-		if ($response->getStatus() == 'success') {
-			$order = new \WC_Order($orderId);
+		if ( $response->getStatus() == 'success' ) {
+			$order = new \WC_Order( $orderId );
 			$order->add_order_note(
-				sprintf(__('Refunded %s', 'woocommerce-iyzico'), $amount)
+				sprintf( __( 'Refunded %s', 'woocommerce-iyzico' ), $amount )
 			);
 
-			$this->logger->info('RefundProcessor: Refund successful for order ' . $orderId);
+			$this->logger->info( 'RefundProcessor: Refund successful for order ' . $orderId );
+
 			return true;
 		}
 
@@ -65,15 +64,14 @@ class RefundProcessor
 	/**
 	 * @throws Exception
 	 */
-	private function isCancellationAvailable($orderId): bool
-	{
-		$order = $this->getOrderByOrderId($orderId);
+	private function isCancellationAvailable( $orderId ): bool {
+		$order = $this->getOrderByOrderId( $orderId );
 
-		$orderDate = new DateTime($order->created_at);
-		$now = new DateTime();
-		$interval = $now->diff($orderDate);
-		if ($interval->days > 1) {
-			$this->logger->error('RefundProcessor: Order cancellation is not available for order ' . $orderId . ' because it is older than 24 hours.');
+		$orderDate = new DateTime( $order->created_at );
+		$now       = new DateTime();
+		$interval  = $now->diff( $orderDate );
+		if ( $interval->days > 1 ) {
+			$this->logger->error( 'RefundProcessor: Order cancellation is not available for order ' . $orderId . ' because it is older than 24 hours.' );
 
 			return false;
 		}
@@ -81,17 +79,15 @@ class RefundProcessor
 		return true;
 	}
 
-	private function getOrderByOrderId($orderId)
-	{
-		return $this->databaseManager->findOrderByOrderId($orderId);
+	private function getOrderByOrderId( $orderId ) {
+		return $this->databaseManager->findOrderByOrderId( $orderId );
 	}
 
-	protected function create_options(): Options
-	{
+	protected function create_options(): Options {
 		$options = new Options();
-		$options->setApiKey($this->checkoutSettings->findByKey('api_key'));
-		$options->setSecretKey($this->checkoutSettings->findByKey('secret_key'));
-		$options->setBaseUrl($this->checkoutSettings->findByKey('api_type'));
+		$options->setApiKey( $this->checkoutSettings->findByKey( 'api_key' ) );
+		$options->setSecretKey( $this->checkoutSettings->findByKey( 'secret_key' ) );
+		$options->setBaseUrl( $this->checkoutSettings->findByKey( 'api_type' ) );
 
 		return $options;
 	}

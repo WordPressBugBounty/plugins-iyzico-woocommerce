@@ -147,7 +147,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 
 		$order    = wc_get_order( $orderId );
 		$cart     = $woocommerce->cart->get_cart();
-		$language = $this->checkoutSettings->findByKey( 'form_language' ) ?? "tr";
+		$language = empty($this->checkoutSettings->findByKey( 'form_language' ) ) ? "tr" : $this->checkoutSettings->findByKey( 'form_language' );
 		$customer = wp_get_current_user();
 
 		$woocommerce->session->set( 'conversationId', $orderId );
@@ -158,7 +158,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 
 		// Payment Source Settings
 		$affiliate     = $this->checkoutSettings->findByKey( 'affiliate_network' );
-		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.5";
+		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.6";
 
 		if ( strlen( $affiliate ) > 0 ) {
 			$paymentSource = "$paymentSource|$affiliate";
@@ -181,14 +181,19 @@ class CheckoutForm extends WC_Payment_Gateway {
 		$checkoutData = $this->checkoutDataFactory->prepareCheckoutData( $customer, $order, $cart );
 		$request->setBuyer( $checkoutData['buyer'] );
 		$request->setBillingAddress( $checkoutData['billingAddress'] );
-		$request->setShippingAddress( $checkoutData['shippingAddress'] );
+		isset( $checkoutData['shippingAddress'] ) ? $request->setShippingAddress( $checkoutData['shippingAddress'] ) : null;
 		$request->setBasketItems( $checkoutData['basketItems'] );
 
 		// Create Options
 		$options = $this->create_options();
 
+		// Check Request Logs Settings
+		$isSave = $this->checkoutSettings->findByKey( 'request_log_enabled' );
+		$isSave === 'yes' ? $this->logger->info( "CheckoutFormInitialize Request: " . $request->toJsonString() ) : null;
+
 		return CheckoutFormInitialize::create( $request, $options );
 	}
+
 
 	public function checkout_form( $orderId ) {
 		$checkoutFormInitialize = $this->create_payment( $orderId );

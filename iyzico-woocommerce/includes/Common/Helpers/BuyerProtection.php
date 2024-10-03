@@ -1,29 +1,27 @@
 <?php
 
 namespace Iyzico\IyzipayWoocommerce\Common\Helpers;
+
 use Iyzico\IyzipayWoocommerce\Checkout\CheckoutSettings;
 
-class BuyerProtection
-{
+class BuyerProtection {
 
 	protected $checkoutSettings;
 
-	public function __construct()
-	{
+	public function __construct() {
 		$this->checkoutSettings = new CheckoutSettings();
 	}
 
 
-	public function getOverlayScript()
-	{
+	public function getOverlayScript() {
 
-		$token = get_option('iyzico_overlay_token');
-		$position = $this->checkoutSettings->findByKey('overlay_script');
+		$token    = get_option( 'iyzico_overlay_token' );
+		$position = $this->checkoutSettings->findByKey( 'overlay_script' );
 
 		$overlayScript = false;
 
 
-		if ($position != 'hide') {
+		if ( $position != 'hide' ) {
 			$overlayScript = "<script> window.iyz = { token:'" . $token . "', position:'" . $position . "',ideaSoft: false, pwi:true};</script>
                     <script src='https://static.iyzipay.com/buyer-protection/buyer-protection.js' type='text/javascript'></script>";
 		}
@@ -31,8 +29,7 @@ class BuyerProtection
 		echo $overlayScript;
 	}
 
-	public static function iyzicoOverlayScriptMobileCss()
-	{
+	public static function iyzicoOverlayScriptMobileCss() {
 
 		echo '<style>
 	                @media screen and (max-width: 380px) {

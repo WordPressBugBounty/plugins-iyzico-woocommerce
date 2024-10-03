@@ -62,7 +62,6 @@ class DataFactory {
 	}
 
 	protected function createBasket( array $cart ): array {
-		$basketItems = [];
 		foreach ( $cart as $item ) {
 			$product    = $item['data'];
 			$basketItem = new BasketItem();
@@ -73,9 +72,11 @@ class DataFactory {
 			if ( $categories && ! is_wp_error( $categories ) ) {
 				$category_names = wp_list_pluck( $categories, 'name' );
 				$basketItem->setCategory1( implode( ', ', $category_names ) );
+			} else {
+				$basketItem->setCategory1('UNKNOWN');
 			}
 
-			$basketItem->setItemType( BasketItemType::PHYSICAL );
+			$basketItem->setItemType( $product->is_virtual() ? BasketItemType::VIRTUAL : BasketItemType::PHYSICAL );
 			$basketItem->setPrice( $item['quantity'] * $this->priceHelper->priceParser( $product->get_price() ) );
 			$basketItems[] = $basketItem;
 		}
@@ -84,12 +85,29 @@ class DataFactory {
 	}
 
 	public function prepareCheckoutData( $customer, WC_Order $order, array $cart ): array {
-		return [
+		$cartHasPhysicalProduct = $this->cartHasPhysicalProduct( $cart );
+		$data                   = [
 			'buyer'           => $this->createBuyer( $customer, $order ),
 			'billingAddress'  => $this->createAddress( $order, 'billing' ),
 			'shippingAddress' => $this->createAddress( $order, 'shipping' ),
 			'basketItems'     => $this->createBasket( $cart ),
 		];
+
+		if ( ! $cartHasPhysicalProduct ) {
+			unset( $data['shippingAddress'] );
+		}
+
+		return $data;
+
 	}
 
+	protected function cartHasPhysicalProduct( array $cart ): bool {
+		foreach ( $cart as $item ) {
+			if ( ! $item['data']->is_virtual() ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }
