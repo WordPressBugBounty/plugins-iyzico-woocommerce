@@ -27,7 +27,7 @@ class PriceHelper {
 			$price     += round( $realPrice, 2 );
 		}
 
-		$shipping = $data->get_total_shipping() + $data->get_shipping_tax();
+		$shipping = intval( $data->get_shipping_total() ) + intval( $data->get_shipping_tax() );
 		if ( $shipping ) {
 			$price += $shipping;
 		}

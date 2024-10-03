@@ -7,7 +7,6 @@ use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 
 class WebhookHelper {
 	private $checkoutSettings;
-	private $status;
 	private $paymentProcessor;
 	private $logger;
 	private $priceHelper;
@@ -38,24 +37,6 @@ class WebhookHelper {
 			$this->checkoutSettings,
 			$this->databaseManager
 		);
-
-		$this->namespace     = 'iyzico/v1';
-		$this->resource_name = 'webhook/' . self::getIyziUrlId();
-	}
-
-	public static function getIyziUrlId() {
-
-		if ( ! get_option( WEBHOOK_URL_KEY ) ) {
-			add_action( 'admin_notices', [ self::class, 'webhookAdminNoticeWarning' ] );
-
-			return;
-		} else {
-			return get_option( WEBHOOK_URL_KEY );
-		}
-	}
-
-	private function get_rest_url( $route ): string {
-		return esc_url_raw( rest_url( "iyzico/v1/{$route}" ) );
 	}
 
 	public function addRoute(): void {
@@ -74,20 +55,16 @@ class WebhookHelper {
 	}
 
 	public function processWebhook( $request ) {
-		$headers         = getallheaders();
-		$iyzicoSignature = $headers['X-IYZ-SIGNATURE'];
+		$headers      = getallheaders();
+		$possibleKeys = [ 'X-IYZ-SIGNATURE', 'X-Iyz-Signature', 'x-iyz-signature', 'x_iyz_signature' ];
 
-		if ( is_null( $iyzicoSignature ) ) {
-			$iyzicoSignature = $headers['X-Iyz-Signature'];
+		foreach ( $possibleKeys as $key ) {
+			if ( isset( $headers[ $key ] ) ) {
+				$iyzicoSignature = $headers[ $key ];
+				break;
+			}
 		}
 
-		if ( is_null( $iyzicoSignature ) ) {
-			$iyzicoSignature = $headers['x-iyz-signature'];
-		}
-
-		if ( is_null( $iyzicoSignature ) ) {
-			$iyzicoSignature = $headers['x_iyz_signature'];
-		}
 
 		$params = wp_parse_args( $request->get_json_params() );
 
@@ -107,12 +84,18 @@ class WebhookHelper {
 
 					return $this->handleSuccessfulPayment( $params );
 				} else {
+					$this->logger->error( 'X-IYZ-SIGNATURE NOT VALID' );
+
 					return new \WP_Error( 'signature_not_valid', 'X-IYZ-SIGNATURE geçersiz', array( 'status' => 404 ) );
 				}
 			} else {
+				$this->logger->error( 'X-IYZ-SIGNATURE NOT FOUND' );
+
 				return new \WP_Error( 'signature_not_found', 'X-IYZ-SIGNATURE bulunamadı', array( 'status' => 404 ) );
 			}
 		} else {
+			$this->logger->error( 'INVALID PARAMETERS' );
+
 			return new \WP_Error( 'invalid_parameters', 'Gönderilen parametreler geçersiz', array( 'status' => 404 ) );
 		}
 	}

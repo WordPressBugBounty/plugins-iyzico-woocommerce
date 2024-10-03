@@ -116,13 +116,11 @@ class AdminHelper {
 		$checkoutSettings = new CheckoutSettings();
 		$pwiSettings      = new PwiSettings();
 
-		$settings = [
+		return [
 			'iyzicoWebhookUrlKey' => get_site_url() . "/wp-json/iyzico/v1/webhook/" . get_option( 'iyzicoWebhookUrlKey' ),
 			'checkout'            => $checkoutSettings->getSettings(),
 			'pwi'                 => $pwiSettings->getSettings()
 		];
-
-		return $settings;
 	}
 
 	public function saveSettings( $request ) {

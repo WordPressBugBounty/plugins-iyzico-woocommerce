@@ -36,8 +36,8 @@ class DatabaseManager {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 			global $wpdb;
-			$table_name = $wpdb->prefix . 'iyzico_order';
-			$table_name2 = $wpdb->prefix . 'iyzico_card';
+			$table_name      = $wpdb->prefix . 'iyzico_order';
+			$table_name2     = $wpdb->prefix . 'iyzico_card';
 			$charset_collate = $wpdb->get_charset_collate();
 
 			$sql = "CREATE TABLE $table_name (
@@ -59,7 +59,7 @@ class DatabaseManager {
                 created_at  timestamp DEFAULT current_timestamp,
                PRIMARY KEY (iyzico_card_id)
             ) $charset_collate;";
-			dbDelta($sql);
+			dbDelta( $sql );
 
 			self::$logger->info( 'Tables created successfully' );
 		} catch ( Exception $e ) {
@@ -71,20 +71,20 @@ class DatabaseManager {
 		self::ensureInitialized();
 		try {
 			global $wpdb;
-			delete_option('iyzico_overlay_token');
-			delete_option('iyzico_overlay_position');
-			delete_option('iyzico_thank_you');
-			delete_option('init_active_webhook_url');
+			delete_option( 'iyzico_overlay_token' );
+			delete_option( 'iyzico_overlay_position' );
+			delete_option( 'iyzico_thank_you' );
+			delete_option( 'init_active_webhook_url' );
 
-			$table_name = $wpdb->prefix . 'iyzico_order';
+			$table_name  = $wpdb->prefix . 'iyzico_order';
 			$table_name2 = $wpdb->prefix . 'iyzico_card';
 
 			$sql = "DROP TABLE IF EXISTS $table_name;";
-			$wpdb->query($sql);
+			$wpdb->query( $sql );
 			$sql = "DROP TABLE IF EXISTS $table_name2;";
-			$wpdb->query($sql);
+			$wpdb->query( $sql );
 			flush_rewrite_rules();
-			
+
 			self::$logger->info( 'Tables dropped successfully' );
 		} catch ( Exception $e ) {
 			self::$logger->error( 'Error dropping tables: ' . $e->getMessage() );

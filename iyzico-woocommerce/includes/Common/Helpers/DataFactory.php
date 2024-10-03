@@ -20,19 +20,19 @@ class DataFactory {
 
 	protected function createBuyer( $customer, WC_Order $order ): Buyer {
 		$buyer = new Buyer();
-		$buyer->setId( $customer->ID );
-		$buyer->setName( $order->get_billing_first_name() );
-		$buyer->setSurname( $order->get_billing_last_name() );
+		$buyer->setId( $this->validateStringVal( $customer->ID ) );
+		$buyer->setName( $this->validateStringVal( $order->get_billing_first_name() ) );
+		$buyer->setSurname( $this->validateStringVal( $order->get_billing_last_name() ) );
 		$buyer->setIdentityNumber( "11111111111" );
-		$buyer->setEmail( $order->get_billing_email() );
+		$buyer->setEmail( $this->validateStringVal( $order->get_billing_email() ) );
 		$buyer->setRegistrationDate( date( 'Y-m-d H:i:s' ) );
 		$buyer->setLastLoginDate( date( 'Y-m-d H:i:s' ) );
-		$buyer->setRegistrationAddress( $order->get_billing_address_1() . ' ' . $order->get_billing_address_2() );
-		$buyer->setCity( $order->get_billing_city() );
-		$buyer->setCountry( $order->get_billing_country() );
-		$buyer->setZipCode( $order->get_billing_postcode() );
-		$buyer->setIp( $_SERVER['REMOTE_ADDR'] );
-		$buyer->setGsmNumber( $order->get_billing_phone() );
+		$buyer->setRegistrationAddress( $this->validateStringVal( $order->get_billing_address_1() ) . ' ' . $this->validateStringVal( $order->get_billing_address_2() ) );
+		$buyer->setCity( $this->validateStringVal( $order->get_billing_city() ) );
+		$buyer->setCountry( $this->validateStringVal( $order->get_billing_country() ) );
+		$buyer->setZipCode( $this->validateStringVal( $order->get_billing_postcode() ) );
+		$buyer->setIp( $this->validateStringVal( $_SERVER['REMOTE_ADDR'] ) );
+		$buyer->setGsmNumber( $this->validateStringVal( $order->get_billing_phone() ) );
 
 		return $buyer;
 	}
@@ -52,11 +52,11 @@ class DataFactory {
 		$zipCode     = $isTypeBilling ? $order->get_billing_postcode() : $order->get_shipping_postcode();
 
 		$address = new Address();
-		$address->setContactName( $contactName );
-		$address->setCity( $city );
-		$address->setCountry( $country );
-		$address->setAddress( $fullAddress );
-		$address->setZipCode( $zipCode );
+		$address->setContactName( $this->validateStringVal( $contactName ) );
+		$address->setCity( $this->validateStringVal( $city ) );
+		$address->setCountry( $this->validateStringVal( $country ) );
+		$address->setAddress( $this->validateStringVal( $fullAddress ) );
+		$address->setZipCode( $this->validateStringVal( $zipCode ) );
 
 		return $address;
 	}
@@ -71,7 +71,8 @@ class DataFactory {
 			$shippingItem->setName( 'Shipping' );
 			$shippingItem->setCategory1( 'Shipping' );
 			$shippingItem->setItemType( BasketItemType::PHYSICAL );
-			$shippingItem->setPrice( $this->priceHelper->priceParser( $order->get_shipping_total() ) );
+			$shippingPrice = strval( intval( $order->get_shipping_total() ) + intval( $order->get_shipping_tax() ) );
+			$shippingItem->setPrice( $shippingPrice );
 			$basketItems[] = $shippingItem;
 		}
 
@@ -84,9 +85,8 @@ class DataFactory {
 			$categories = get_the_terms( $product->get_id(), 'product_cat' );
 			if ( $categories && ! is_wp_error( $categories ) ) {
 				$category_names = wp_list_pluck( $categories, 'name' );
-				$basketItem->setCategory1( implode( ', ', $category_names ) );
-			} else {
-				$basketItem->setCategory1( 'UNKNOWN' );
+				$category1      = implode( ', ', $category_names );
+				$basketItem->setCategory1( $this->validateStringVal( $category1 ) );
 			}
 
 			$basketItem->setItemType( $product->is_virtual() ? BasketItemType::VIRTUAL : BasketItemType::PHYSICAL );
@@ -126,5 +126,21 @@ class DataFactory {
 
 	protected function orderHasShippingPrice( WC_Order $order ): bool {
 		return $order->get_shipping_total() > 0;
+	}
+
+	protected function validateStringVal( $string ): string {
+		if ( empty( $string ) ) {
+			return 'UNKNOWN';
+		}
+
+		if ( is_null( $string ) ) {
+			return 'UNKNOWN';
+		}
+
+		if ( strlen( $string ) === 0 ) {
+			return 'UNKNOWN';
+		}
+
+		return $string;
 	}
 }

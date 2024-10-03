@@ -147,7 +147,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 
 		$order    = wc_get_order( $orderId );
 		$cart     = $woocommerce->cart->get_cart();
-		$language = empty($this->checkoutSettings->findByKey( 'form_language' ) ) ? "tr" : $this->checkoutSettings->findByKey( 'form_language' );
+		$language = empty( $this->checkoutSettings->findByKey( 'form_language' ) ) ? "tr" : $this->checkoutSettings->findByKey( 'form_language' );
 		$customer = wp_get_current_user();
 
 		$woocommerce->session->set( 'conversationId', $orderId );
