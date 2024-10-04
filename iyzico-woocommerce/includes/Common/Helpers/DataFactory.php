@@ -82,13 +82,16 @@ class DataFactory {
 			$basketItem->setId( (string) $item['product_id'] );
 			$basketItem->setName( $product->get_name() );
 
-			$categories = get_the_terms( $product->get_id(), 'product_cat' );
+			$product_id = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
+			$categories = get_the_terms( $product_id, 'product_cat' );
+
+			$category1 = '';
 			if ( $categories && ! is_wp_error( $categories ) ) {
 				$category_names = wp_list_pluck( $categories, 'name' );
 				$category1      = implode( ', ', $category_names );
-				$basketItem->setCategory1( $this->validateStringVal( $category1 ) );
 			}
 
+			$basketItem->setCategory1( $this->validateStringVal( $category1 ) );
 			$basketItem->setItemType( $product->is_virtual() ? BasketItemType::VIRTUAL : BasketItemType::PHYSICAL );
 			$basketItem->setPrice( $item['quantity'] * $this->priceHelper->priceParser( $product->get_price() ) );
 			$basketItems[] = $basketItem;
