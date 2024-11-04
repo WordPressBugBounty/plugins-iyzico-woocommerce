@@ -4,6 +4,7 @@ namespace Iyzico\IyzipayWoocommerce\Common\Helpers;
 
 use Iyzico\IyzipayWoocommerce\Checkout\CheckoutSettings;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
+use WP_Error;
 
 class WebhookHelper {
 	private $checkoutSettings;
@@ -14,9 +15,7 @@ class WebhookHelper {
 	private $versionChecker;
 	private $tlsVerifier;
 	private $databaseManager;
-	private $paymentConversationId;
-	private $token;
-	private $iyziEventType;
+	private $signatureChecker;
 
 
 	public function __construct() {
@@ -27,6 +26,7 @@ class WebhookHelper {
 		$this->tlsVerifier      = new TlsVerifier();
 		$this->checkoutSettings = new CheckoutSettings();
 		$this->databaseManager  = new DatabaseManager();
+		$this->signatureChecker = new SignatureChecker();
 
 		$this->paymentProcessor = new PaymentProcessor(
 			$this->logger,
@@ -35,7 +35,8 @@ class WebhookHelper {
 			$this->versionChecker,
 			$this->tlsVerifier,
 			$this->checkoutSettings,
-			$this->databaseManager
+			$this->databaseManager,
+			$this->signatureChecker
 		);
 	}
 
@@ -54,53 +55,101 @@ class WebhookHelper {
 		] );
 	}
 
+	private function handleSuccessfulPayment( $data, $isValidateSignature = false ) {
+		if ( $isValidateSignature ) {
+			$this->logger->webhook( "USE X-IYZ-SIGNATURE-V3: " . print_r( $data, true ) );
+
+			return $this->paymentProcessor->processWebhookWithSignature( $data );
+		}
+
+		$this->logger->webhook( "NOT USE X-IYZ-SIGNATURE-V3: " . print_r( $data, true ) );
+
+		return $this->paymentProcessor->processWebhook( $data );
+	}
+
 	public function processWebhook( $request ) {
 		$headers      = getallheaders();
-		$possibleKeys = [ 'X-IYZ-SIGNATURE', 'X-Iyz-Signature', 'x-iyz-signature', 'x_iyz_signature' ];
+		$possibleKeys = [
+			'X-IYZ-SIGNATURE-V3',
+			'X-Iyz-Signature-V3',
+			'x-iyz-signature-v3',
+			'x_iyz_signature_v3',
+		];
 
-		foreach ( $possibleKeys as $key ) {
-			if ( isset( $headers[ $key ] ) ) {
-				$iyzicoSignature = $headers[ $key ];
+		$iyzicoSignature = null;
+		$key             = null;
+
+		foreach ( $possibleKeys as $possibleKey ) {
+			if ( isset( $headers[ $possibleKey ] ) ) {
+				$iyzicoSignature = $headers[ $possibleKey ];
+				$key             = $possibleKey;
 				break;
 			}
 		}
 
-
-		$params = wp_parse_args( $request->get_json_params() );
-
-		if ( isset( $params['iyziEventType'] ) && isset( $params['token'] ) && isset( $params['paymentConversationId'] ) ) {
-			$this->paymentConversationId = $params['paymentConversationId'];
-			$this->token                 = $params['token'];
-			$this->iyziEventType         = $params['iyziEventType'];
-
-			if ( $iyzicoSignature ) {
-				$createIyzicoSignature = base64_encode( sha1( $this->checkoutSettings->findByKey( 'secret_key' ) . $this->iyziEventType . $this->token, true ) );
-				if ( $iyzicoSignature == $createIyzicoSignature ) {
-					$params = [
-						'iyziEventType'         => $this->iyziEventType,
-						'token'                 => $this->token,
-						'paymentConversationId' => $this->paymentConversationId,
-					];
-
-					return $this->handleSuccessfulPayment( $params );
-				} else {
-					$this->logger->error( 'X-IYZ-SIGNATURE NOT VALID' );
-
-					return new \WP_Error( 'signature_not_valid', 'X-IYZ-SIGNATURE geçersiz', array( 'status' => 404 ) );
-				}
-			} else {
-				$this->logger->error( 'X-IYZ-SIGNATURE NOT FOUND' );
-
-				return new \WP_Error( 'signature_not_found', 'X-IYZ-SIGNATURE bulunamadı', array( 'status' => 404 ) );
-			}
+		if ( $key !== null ) {
+			match ( $key ) {
+				'X-IYZ-SIGNATURE-V3', 'X-Iyz-Signature-V3', 'x-iyz-signature-v3', 'x_iyz_signature_v3' => $this->processWebhookV3( $request, $iyzicoSignature ),
+				default => $this->processWebhookDefault( $request ),
+			};
 		} else {
-			$this->logger->error( 'INVALID PARAMETERS' );
-
-			return new \WP_Error( 'invalid_parameters', 'Gönderilen parametreler geçersiz', array( 'status' => 404 ) );
+			$this->processWebhookDefault( $request );
 		}
 	}
 
-	private function handleSuccessfulPayment( $data ) {
-		return $this->paymentProcessor->processWebhook( $data );
+	public function processWebhookV3( $request, $iyzicoSignature ) {
+		$params    = wp_parse_args( $request->get_json_params() );
+		$secretKey = $this->checkoutSettings->findByKey( 'secret_key' );
+
+		$requiredParams = [ 'iyziEventType', 'iyziPaymentId', 'token', 'paymentConversationId', 'status' ];
+		foreach ( $requiredParams as $param ) {
+			if ( empty( $params[ $param ] ) ) {
+				$this->logger->webhook( "Error, missing param: $param" );
+
+				return new WP_Error( 'missing_param', "Error, missing param: $param", array( 'status' => 400 ) );
+			}
+		}
+
+		$iyziEventType         = sanitize_text_field( $params['iyziEventType'] );
+		$iyziPaymentId         = sanitize_text_field( $params['iyziPaymentId'] );
+		$token                 = sanitize_text_field( $params['token'] );
+		$paymentConversationId = sanitize_text_field( $params['paymentConversationId'] );
+		$status                = sanitize_text_field( $params['status'] );
+		$key                   = $secretKey . $iyziEventType . $iyziPaymentId . $token . $paymentConversationId . $status;
+		$hmac256Signature      = bin2hex( hash_hmac( 'sha256', $key, $secretKey, true ) );
+
+		if ( $iyzicoSignature === $hmac256Signature ) {
+			$data = [
+				'iyziEventType'         => $iyziEventType,
+				'paymentConversationId' => $paymentConversationId,
+				'status'                => $status,
+			];
+
+			return $this->handleSuccessfulPayment( $data, true );
+		} else {
+			$this->logger->webhook( 'X-IYZ-SIGNATURE-V3 invalid signature.' );
+
+			return new WP_Error( 'signature_not_valid', 'Error, invalid signature value.', array( 'status' => 404 ) );
+		}
+	}
+
+	public function processWebhookDefault( $request ) {
+		$params         = wp_parse_args( $request->get_json_params() );
+		$requiredParams = [ 'iyziEventType', 'token', 'paymentConversationId' ];
+		foreach ( $requiredParams as $param ) {
+			if ( empty( $params[ $param ] ) ) {
+				$this->logger->webhook( "Error, missing param: $param" );
+
+				return new WP_Error( 'missing_param', "Error, missing param: $param", array( 'status' => 400 ) );
+			}
+		}
+
+		$data = [
+			'iyziEventType'         => sanitize_text_field( $params['iyziEventType'] ),
+			'token'                 => sanitize_text_field( $params['token'] ),
+			'paymentConversationId' => sanitize_text_field( $params['paymentConversationId'] ),
+		];
+
+		return $this->handleSuccessfulPayment( $data );
 	}
 }

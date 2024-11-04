@@ -92,48 +92,6 @@ class DatabaseManager {
 	}
 
 	/**
-	 * @throws Exception
-	 */
-	private static function getTableDefinitions(): array {
-		$json_file = PLUGIN_PATH . "/includes/common/database/table_definitions.json";
-		if ( ! file_exists( $json_file ) ) {
-			self::$logger->error( 'Table definitions JSON file not found' );
-			throw new Exception( "Table definitions file not found: $json_file" );
-		}
-		$json_content = file_get_contents( $json_file );
-		$tables       = json_decode( $json_content, true );
-		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			self::$logger->error( 'Error decoding table definitions JSON: ' . json_last_error_msg() );
-			throw new Exception( "Error decoding table definitions JSON: " . json_last_error_msg() );
-		}
-
-		return $tables;
-	}
-
-	private static function generateCreateTableSQL( string $table_name, array $columns ): string {
-		$sql        = "CREATE TABLE " . self::$wpdb->prefix . $table_name . " (";
-		$primaryKey = '';
-
-		foreach ( $columns as $column_name => $definition ) {
-			if ( $column_name === 'PRIMARY KEY' ) {
-				$primaryKey = "PRIMARY KEY ({$definition})";
-			} else {
-				$sql .= "`$column_name` $definition,";
-			}
-		}
-
-		if ( $primaryKey ) {
-			$sql .= $primaryKey;
-		} else {
-			$sql = rtrim( $sql, ',' );
-		}
-
-		$sql .= ") " . self::$wpdb->get_charset_collate() . ";";
-
-		return $sql;
-	}
-
-	/**
 	 * @param $paymentId * iyzico Response PaymentId
 	 * @param $orderId * WooCommerce OrderId
 	 * @param $totalAmount * Order Total Amount

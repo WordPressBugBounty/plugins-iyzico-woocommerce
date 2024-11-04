@@ -4,18 +4,16 @@ namespace Iyzico\IyzipayWoocommerce\Common\Helpers;
 
 class PriceHelper {
 
-	public function subTotalPriceCalc( $items, $data ) {
-
-		$price = 0;
-
-		$itemSize = count( $items );
+	public function subTotalPriceCalc( $carts, $order ) {
+		$price    = 0;
+		$itemSize = count( $carts );
 		if ( ! $itemSize ) {
-			$price = $data->get_total();
+			$price = $order->get_total();
 
 			return $this->priceParser( $price );
 		}
 
-		foreach ( $items as $item ) {
+		foreach ( $carts as $item ) {
 			if ( $item['variation_id'] ) {
 				$productId = $item['variation_id'];
 			} else {
@@ -23,11 +21,13 @@ class PriceHelper {
 			}
 
 			$product   = wc_get_product( $productId );
-			$realPrice = $this->realPrice( $product->get_sale_price(), $product->get_price() ) * $item['quantity'];
-			$price     += round( $realPrice, 2 );
+			$realPrice = $item['quantity'] * $this->realPrice( $product->get_sale_price(), $product->get_price() );
+
+			$price += round( $realPrice, 2 );
 		}
 
-		$shipping = intval( $data->get_shipping_total() ) + intval( $data->get_shipping_tax() );
+		$shipping = $order->get_total_shipping() + $order->get_shipping_tax();
+
 		if ( $shipping ) {
 			$price += $shipping;
 		}
@@ -40,10 +40,8 @@ class PriceHelper {
 		if ( strpos( $price, "." ) === false ) {
 			return $price . ".0";
 		}
-
 		$subStrIndex   = 0;
 		$priceReversed = strrev( $price );
-
 		for ( $i = 0; $i < strlen( $priceReversed ); $i ++ ) {
 			if ( strcmp( $priceReversed[ $i ], "0" ) == 0 ) {
 				$subStrIndex = $i + 1;
@@ -58,7 +56,7 @@ class PriceHelper {
 		return strrev( substr( $priceReversed, $subStrIndex ) );
 	}
 
-	protected function realPrice( $salePrice, $regularPrice ) {
+	public function realPrice( $salePrice, $regularPrice ) {
 		if ( empty( $salePrice ) ) {
 			$salePrice = $regularPrice;
 		}

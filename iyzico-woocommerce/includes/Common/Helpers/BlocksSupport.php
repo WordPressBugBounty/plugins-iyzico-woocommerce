@@ -19,11 +19,6 @@ class BlocksSupport {
 	 */
 	public static function init(): void {
 		add_action( 'woocommerce_blocks_loaded', [ self::class, 'woocommerce_blocks_support' ] );
-
-		add_action( 'before_woocommerce_init', function () {
-			error_log( 'WooCommerce block support loaded.' );
-		} );
-
 		add_action( 'before_woocommerce_init', [ self::class, 'woocommerce_blocks_compatibility' ] );
 	}
 

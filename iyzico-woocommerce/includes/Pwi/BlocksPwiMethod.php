@@ -13,9 +13,9 @@ use Iyzico\IyzipayWoocommerce\Checkout\CheckoutSettings;
 class BlocksPwiMethod extends AbstractPaymentMethodType {
 
 	public $gateway;
-	protected $name = 'pwi';
 	public $pwiSettings;
 	public $checkoutSettings;
+	protected $name = 'pwi';
 
 	public function __construct() {
 		$this->pwiSettings      = new PwiSettings();

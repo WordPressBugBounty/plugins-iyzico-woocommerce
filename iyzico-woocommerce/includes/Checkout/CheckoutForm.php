@@ -3,22 +3,23 @@
 namespace Iyzico\IyzipayWoocommerce\Checkout;
 
 use Exception;
-use Iyzico\IyzipayWoocommerce\Common\Helpers\RefundProcessor;
-use WC_Payment_Gateway;
 use Iyzico\IyzipayWoocommerce\Admin\SettingsPage;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\CookieManager;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\DataFactory;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\Logger;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\PaymentProcessor;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\PriceHelper;
+use Iyzico\IyzipayWoocommerce\Common\Helpers\RefundProcessor;
+use Iyzico\IyzipayWoocommerce\Common\Helpers\SignatureChecker;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\TlsVerifier;
 use Iyzico\IyzipayWoocommerce\Common\Helpers\VersionChecker;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
-use Iyzipay\Options;
 use Iyzipay\Model\CheckoutFormInitialize;
 use Iyzipay\Model\ProtectedOverleyScript;
+use Iyzipay\Options;
 use Iyzipay\Request\CreateCheckoutFormInitializeRequest;
 use Iyzipay\Request\RetrieveProtectedOverleyScriptRequest;
+use WC_Payment_Gateway;
 
 class CheckoutForm extends WC_Payment_Gateway {
 
@@ -38,6 +39,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 	public $adminSettings;
 	public $databaseManager;
 	public $refundProcessor;
+	public $signatureChecker;
 
 	public function __construct() {
 		$this->id                 = "iyzico";
@@ -59,12 +61,13 @@ class CheckoutForm extends WC_Payment_Gateway {
 			'refunds'
 		];
 
-		$this->logger          = new Logger();
-		$this->cookieManager   = new CookieManager();
-		$this->versionChecker  = new VersionChecker( $this->logger );
-		$this->tlsVerifier     = new TlsVerifier();
-		$this->priceHelper     = new PriceHelper();
-		$this->databaseManager = new DatabaseManager();
+		$this->logger           = new Logger();
+		$this->cookieManager    = new CookieManager();
+		$this->versionChecker   = new VersionChecker( $this->logger );
+		$this->tlsVerifier      = new TlsVerifier();
+		$this->priceHelper      = new PriceHelper();
+		$this->databaseManager  = new DatabaseManager();
+		$this->signatureChecker = new SignatureChecker();
 
 		$this->paymentProcessor = new PaymentProcessor(
 			$this->logger,
@@ -73,10 +76,11 @@ class CheckoutForm extends WC_Payment_Gateway {
 			$this->versionChecker,
 			$this->tlsVerifier,
 			$this->checkoutSettings,
-			$this->databaseManager
+			$this->databaseManager,
+			$this->signatureChecker
 		);
 
-		$this->checkoutDataFactory = new DataFactory( $this->priceHelper, $this->checkoutSettings );
+		$this->checkoutDataFactory = new DataFactory( $this->priceHelper, $this->checkoutSettings, $this->logger );
 		$this->checkoutView        = new CheckoutView( $this->checkoutSettings );
 		$this->adminSettings       = new SettingsPage();
 		$this->refundProcessor     = new RefundProcessor();
@@ -101,6 +105,15 @@ class CheckoutForm extends WC_Payment_Gateway {
 		}
 
 		return true;
+	}
+
+	protected function create_options(): Options {
+		$options = new Options();
+		$options->setApiKey( $this->checkoutSettings->findByKey( 'api_key' ) );
+		$options->setSecretKey( $this->checkoutSettings->findByKey( 'secret_key' ) );
+		$options->setBaseUrl( $this->checkoutSettings->findByKey( 'api_type' ) );
+
+		return $options;
 	}
 
 	public function handle_api_request() {
@@ -158,7 +171,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 
 		// Payment Source Settings
 		$affiliate     = $this->checkoutSettings->findByKey( 'affiliate_network' );
-		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.7";
+		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-3.5.8";
 
 		if ( strlen( $affiliate ) > 0 ) {
 			$paymentSource = "$paymentSource|$affiliate";
@@ -168,7 +181,7 @@ class CheckoutForm extends WC_Payment_Gateway {
 		$request = new CreateCheckoutFormInitializeRequest();
 		$request->setLocale( $language );
 		$request->setConversationId( $orderId );
-		$request->setPrice( $this->priceHelper->subTotalPriceCalc( $cart, $order ) );
+		$request->setPrice( $this->checkoutDataFactory->createPrice( $order, $cart ) );
 		$request->setPaidPrice( $this->priceHelper->priceParser( round( $order->get_total(), 2 ) ) );
 		$request->setCurrency( $currency );
 		$request->setBasketId( $orderId );
@@ -191,9 +204,34 @@ class CheckoutForm extends WC_Payment_Gateway {
 		$isSave = $this->checkoutSettings->findByKey( 'request_log_enabled' );
 		$isSave === 'yes' ? $this->logger->info( "CheckoutFormInitialize Request: " . $request->toJsonString() ) : null;
 
-		return CheckoutFormInitialize::create( $request, $options );
+		$checkoutFormResponse = CheckoutFormInitialize::create( $request, $options );
+
+		$rawResult         = $checkoutFormResponse->getRawResult();
+		$rawResultResponse = json_decode( $rawResult );
+
+		$conversationId = $checkoutFormResponse->getConversationId();
+		$token          = $checkoutFormResponse->getToken();
+		$signature      = $rawResultResponse->signature;
+
+		$secretKey           = $options->getSecretKey();
+		$calculatedSignature = $this->signatureChecker->calculateHmacSHA256Signature( [
+			$conversationId,
+			$token
+		], $secretKey );
+
+		if ( $signature != $calculatedSignature ) {
+			$this->logger->error( "CheckoutForm.php: conversationId: $conversationId token: $token #Signature is not valid." );
+		}
+
+		return $checkoutFormResponse;
 	}
 
+	public function redirect_to_iyzico( string $paymentPageUrl ) {
+		return [
+			'result'   => 'success',
+			'redirect' => $paymentPageUrl
+		];
+	}
 
 	public function checkout_form( $orderId ) {
 		$checkoutFormInitialize = $this->create_payment( $orderId );
@@ -219,21 +257,5 @@ class CheckoutForm extends WC_Payment_Gateway {
 	public function load_form() {
 		wp_enqueue_style( 'iyzico-loading-style', plugin_dir_url( PLUGIN_BASEFILE ) . 'assets/css/iyzico-loading.css' );
 		$this->checkoutView->renderLoadingHtml();
-	}
-
-	public function redirect_to_iyzico( string $paymentPageUrl ) {
-		return [
-			'result'   => 'success',
-			'redirect' => $paymentPageUrl
-		];
-	}
-
-	protected function create_options(): Options {
-		$options = new Options();
-		$options->setApiKey( $this->checkoutSettings->findByKey( 'api_key' ) );
-		$options->setSecretKey( $this->checkoutSettings->findByKey( 'secret_key' ) );
-		$options->setBaseUrl( $this->checkoutSettings->findByKey( 'api_type' ) );
-
-		return $options;
 	}
 }

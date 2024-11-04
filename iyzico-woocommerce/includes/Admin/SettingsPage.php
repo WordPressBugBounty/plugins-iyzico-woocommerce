@@ -32,6 +32,20 @@ class SettingsPage {
             </a>
         </h3>
 		<?php
+		$this->getHtmlContent();
+	}
+
+	public function getHtmlContent() {
+		$html = '<style scoped>
+                    @media (max-width:768px){.iyziBrand{position:fixed;bottom:0;top:auto!important;right:0!important}}
+                </style>
+                <div class="iyziBrandWrap">
+                    <div class="iyziBrand" style="clear:both;position:absolute;right: 50px;top:440px;display: flex;flex-direction: column;justify-content: center;">
+                        <img src=' . PLUGIN_URL . '/assets/images/iyzico_logo.png style="width: 250px;margin-left: auto;">
+                        <p style="text-align:center;"><strong>Version: </strong>3.5.8</p>
+                    </div>
+                </div>';
+		echo $html;
 	}
 
 	public function renderPage(): void {
@@ -59,28 +73,6 @@ class SettingsPage {
 		$this->enqueueAdminStyle();
 	}
 
-	public function enqueueAdminStyle(): void {
-		$asset_file = PLUGIN_DIR_PATH . 'assets/admin/index.asset.php';
-
-		if ( ! file_exists( $asset_file ) ) {
-			return;
-		}
-
-		$asset = include $asset_file;
-
-		wp_enqueue_style(
-			'AdminStyle',
-			plugins_url( 'assets/admin/index.css', PLUGIN_BASEFILE ),
-			array_filter(
-				$asset['dependencies'],
-				function ( $style ) {
-					return wp_style_is( $style, 'registered' );
-				}
-			),
-			$asset['version']
-		);
-	}
-
 	public function enqueueAdminScript(): void {
 		$asset_file = PLUGIN_DIR_PATH . 'assets/admin/index.asset.php';
 
@@ -105,5 +97,27 @@ class SettingsPage {
 		);
 
 		$this->restApi->localizeScript();
+	}
+
+	public function enqueueAdminStyle(): void {
+		$asset_file = PLUGIN_DIR_PATH . 'assets/admin/index.asset.php';
+
+		if ( ! file_exists( $asset_file ) ) {
+			return;
+		}
+
+		$asset = include $asset_file;
+
+		wp_enqueue_style(
+			'AdminStyle',
+			plugins_url( 'assets/admin/index.css', PLUGIN_BASEFILE ),
+			array_filter(
+				$asset['dependencies'],
+				function ( $style ) {
+					return wp_style_is( $style, 'registered' );
+				}
+			),
+			$asset['version']
+		);
 	}
 }

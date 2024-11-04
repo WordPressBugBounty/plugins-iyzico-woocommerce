@@ -1,20 +1,31 @@
 <?php
-
 /**
+ * iyzipay WooCommerce
+ *
+ * @package iyzico WooCommerce
+ * @author iyzico
+ * @copyright 2024 iyzico
+ * @license LGPL-3.0-or-later
+ *
+ * @wordpress-plugin
  * Plugin Name: iyzico WooCommerce
  * Plugin URI: https://wordpress.org/plugins/iyzico-woocommerce
  * Description: iyzico Payment Gateway for WooCommerce.
+ * Version: 3.5.8
+ * Requires at least: 6.6.2
+ * WC requires at least: 9.3.3
+ * Requires PHP: 8.2
  * Author: iyzico
  * Author URI: https://iyzico.com
- * Version: 3.5.7
- * Requires Plugins: woocommerce
- * Requires at least: 6.6.2
- * Tested up to: 6.6.2
- * WC requires at least: 9.0.0
- * WC tested up to: 9.3.3
- * Text Domain: iyzico WooCommerce
+ * Text Domain: woocommerce-iyzico
  * Domain Path: /i18n/languages/
- * Tags: payment gateway, WooCommerce, iyzico
+ * License: LGPL v3 or later
+ * License URI: http://www.gnu.org/licenses/lgpl-3.0.txt
+ * Update URI: https://wordpress.org/plugins/iyzico-woocommerce
+ * Requires Plugins: woocommerce
+ *
+ * Tested up to: 6.6.2
+ * WC tested up to: 9.3.3
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -24,7 +35,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * These constants are used to define the plugin version, base file, path, url and language path.
  */
-const PLUGIN_VERSION  = '3.5.7';
+const PLUGIN_VERSION  = '3.5.8';
 const PLUGIN_BASEFILE = __FILE__;
 
 define( 'PLUGIN_PATH', untrailingslashit( plugin_dir_path( PLUGIN_BASEFILE ) ) );

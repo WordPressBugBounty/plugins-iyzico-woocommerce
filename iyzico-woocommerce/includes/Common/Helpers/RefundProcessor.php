@@ -9,6 +9,7 @@ use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 use Iyzipay\Model\AmountBaseRefund;
 use Iyzipay\Options;
 use Iyzipay\Request\AmountBaseRefundRequest;
+use WC_Order;
 
 class RefundProcessor {
 	private Logger $logger;
@@ -24,7 +25,9 @@ class RefundProcessor {
 	}
 
 	public function refund( $orderId, $amount ) {
-		$order = $this->getOrderByOrderId( $orderId );
+		$order  = $this->getOrderByOrderId( $orderId );
+		$isSave = $this->checkoutSettings->findByKey( 'request_log_enabled' );
+
 
 		if ( is_null( $order ) ) {
 			$this->logger->error( 'RefundProcessor: Order not found for order id ' . $orderId );
@@ -42,13 +45,18 @@ class RefundProcessor {
 
 		$request = new AmountBaseRefundRequest();
 		$request->setPaymentId( $paymentId );
+		$request->setConversationId( $orderId );
 		$request->setPrice( $this->priceHelper->priceParser( $amount ) );
 		$request->setIp( $_SERVER['REMOTE_ADDR'] );
 
+
 		$response = AmountBaseRefund::create( $request, $options );
 
+		$isSave === 'yes' ? $this->logger->info( "AmountBaseRefund Request: " . print_r( $request, true ) ) : null;
+		$isSave === 'yes' ? $this->logger->info( "AmountBaseRefund Response: " . print_r( $response, true ) ) : null;
+
 		if ( $response->getStatus() == 'success' ) {
-			$order = new \WC_Order( $orderId );
+			$order = new WC_Order( $orderId );
 			$order->add_order_note(
 				sprintf( __( 'Refunded %s', 'woocommerce-iyzico' ), $amount )
 			);
@@ -59,6 +67,19 @@ class RefundProcessor {
 		}
 
 		return false;
+	}
+
+	private function getOrderByOrderId( $orderId ) {
+		return $this->databaseManager->findOrderByOrderId( $orderId );
+	}
+
+	protected function create_options(): Options {
+		$options = new Options();
+		$options->setApiKey( $this->checkoutSettings->findByKey( 'api_key' ) );
+		$options->setSecretKey( $this->checkoutSettings->findByKey( 'secret_key' ) );
+		$options->setBaseUrl( $this->checkoutSettings->findByKey( 'api_type' ) );
+
+		return $options;
 	}
 
 	/**
@@ -77,18 +98,5 @@ class RefundProcessor {
 		}
 
 		return true;
-	}
-
-	private function getOrderByOrderId( $orderId ) {
-		return $this->databaseManager->findOrderByOrderId( $orderId );
-	}
-
-	protected function create_options(): Options {
-		$options = new Options();
-		$options->setApiKey( $this->checkoutSettings->findByKey( 'api_key' ) );
-		$options->setSecretKey( $this->checkoutSettings->findByKey( 'secret_key' ) );
-		$options->setBaseUrl( $this->checkoutSettings->findByKey( 'api_type' ) );
-
-		return $options;
 	}
 }

@@ -10,10 +10,11 @@ use Iyzico\IyzipayWoocommerce\Common\Interfaces\LoggerInterface;
  * @package Iyzico\IyzipayWoocommerce\Common\Abstracts
  */
 abstract class AbstractLogger implements LoggerInterface {
-	protected string $logDir;
 	protected const INFO_LOG = 'iyzico_info.log';
 	protected const ERROR_LOG = 'iyzico_error.log';
 	protected const WARN_LOG = 'iyzico_warn.log';
+	protected const WEBHOOK_LOG = 'iyzico_webhook.log';
+	protected string $logDir;
 
 	/**
 	 * AbstractLogger constructor.
@@ -23,6 +24,24 @@ abstract class AbstractLogger implements LoggerInterface {
 	public function __construct( string $logDir = '' ) {
 		$this->logDir = $logDir ?: PLUGIN_PATH . '/log_files/';
 		$this->ensureLogDirectoryExists();
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function ensureLogDirectoryExists(): void {
+		if ( ! file_exists( $this->logDir ) ) {
+			mkdir( $this->logDir, 0755, true );
+			$this->createHtaccess();
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function createHtaccess(): void {
+		$htaccessContent = "Deny from all\n";
+		file_put_contents( $this->logDir . '.htaccess', $htaccessContent );
 	}
 
 	/**
@@ -47,6 +66,13 @@ abstract class AbstractLogger implements LoggerInterface {
 	abstract public function warn( string $message ): void;
 
 	/**
+	 * @param string $message
+	 *
+	 * @return void
+	 */
+	abstract public function webhook( string $message ): void;
+
+	/**
 	 * @param string $file
 	 * @param string $level
 	 * @param string $message
@@ -59,23 +85,5 @@ abstract class AbstractLogger implements LoggerInterface {
 
 		$filePath = $this->logDir . $file;
 		file_put_contents( $filePath, $logMessage, FILE_APPEND | LOCK_EX );
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function ensureLogDirectoryExists(): void {
-		if ( ! file_exists( $this->logDir ) ) {
-			mkdir( $this->logDir, 0755, true );
-			$this->createHtaccess();
-		}
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function createHtaccess(): void {
-		$htaccessContent = "Deny from all\n";
-		file_put_contents( $this->logDir . '.htaccess', $htaccessContent );
 	}
 }

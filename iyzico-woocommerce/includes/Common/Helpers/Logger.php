@@ -38,4 +38,13 @@ class Logger extends AbstractLogger {
 	public function warn( string $message ): void {
 		$this->log( self::WARN_LOG, 'WARNING', $message );
 	}
+
+	/**
+	 * @param string $message
+	 *
+	 * @return void
+	 */
+	public function webhook( string $message ): void {
+		$this->log( self::WEBHOOK_LOG, 'WEBHOOK', $message );
+	}
 }
