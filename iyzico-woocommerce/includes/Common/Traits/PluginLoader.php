@@ -2,16 +2,13 @@
 
 namespace Iyzico\IyzipayWoocommerce\Common\Traits;
 
-/**
- * PluginLoader
- *
- * @package Iyzico\IyzipayWoocommerce\Common\Traits
- */
-trait PluginLoader {
+trait PluginLoader
+{
 	private static $instance = null;
 
-	public static function getInstance() {
-		if ( self::$instance === null ) {
+	public static function getInstance()
+	{
+		if (self::$instance === null) {
 			self::$instance = new self();
 		}
 
@@ -20,7 +17,8 @@ trait PluginLoader {
 
 	abstract public function run();
 
-	public static function init() {
+	public static function init()
+	{
 		return static::getInstance()->run();
 	}
 }
