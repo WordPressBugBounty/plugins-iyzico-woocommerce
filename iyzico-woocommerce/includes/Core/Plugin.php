@@ -19,7 +19,14 @@ class Plugin
 	public static function activate()
 	{
 		DatabaseManager::createTables();
-		if (IYZICO_DB_VERSION >= 3.59) {
+		if (IYZICO_DB_VERSION >= 3.58) {
+			DatabaseManager::updateTables();
+		}
+	}
+
+	public static function update()
+	{
+		if (IYZICO_DB_VERSION >= 3.58) {
 			DatabaseManager::updateTables();
 		}
 	}
@@ -48,9 +55,24 @@ class Plugin
 		$this->initPaymentGateway();
 		$this->generateWebhookKey();
 
+		add_action('plugins_loaded', [$this, 'checkDatabaseUpdate']);
+
 		BlocksSupport::init();
 		HighPerformanceOrderStorageSupport::init();
 	}
+
+	public function checkDatabaseUpdate()
+	{
+		$installed_version = get_option('iyzico_db_version', '0');
+
+		if (version_compare($installed_version, IYZICO_DB_VERSION, '<')) {
+			if (IYZICO_DB_VERSION >= 3.58) {
+				DatabaseManager::updateTables();
+			}
+			update_option('iyzico_db_version', IYZICO_DB_VERSION);
+		}
+	}
+
 
 	private function loadDependencies(): void
 	{
