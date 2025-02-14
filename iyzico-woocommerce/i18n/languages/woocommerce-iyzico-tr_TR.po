@@ -15,53 +15,73 @@ msgstr ""
 "X-Loco-Version: 2.6.3; wp-6.3-alpha-55617"
 
 # This file is distributed under the GNU General Public License v2 or later.
-msgid "Environment"
-msgstr "Ortam Türü"
+msgid "Api Type"
+msgstr "Api Türü"
 
-msgid "API Key"
-msgstr "API Anahtarı"
+msgid "Api Key"
+msgstr "Api Anahtarı"
 
 msgid "Secret Key"
 msgstr "Güvenlik Anahtarı"
 
 msgid "Payment Value"
-msgstr "Ödeme Seçeneği Başlık"
+msgstr "Ödeme Seçeneği Metni"
+
+msgid "Payment Value Message"
+msgstr "Ödeme Seçeneği Başlığı"
 
 msgid "Payment Form Description Value"
-msgstr "Ödeme Seçeneği Açıklama"
+msgstr "Ödeme Seçeneği Açıklaması"
 
 msgid "Enable/Disable"
-msgstr "Etkinleştir/Devre Dışı Bırak"
+msgstr "Eklenti Durumu"
 
-msgid "Enable iyzico Checkout Form"
-msgstr "iyzico Ödeme Formu Etkinleştir"
+msgid "Enable iyzico checkout"
+msgstr "iyzico ödeme formunu etkinleştir"
 
 msgid "Payment Form Design"
-msgstr "Ödeme Formu Tasarımı"
+msgstr "Ödeme Formu Görünümü"
 
 msgid "Left"
-msgstr "Sol Alt Kısım"
+msgstr "Alt Sol"
 
 msgid "Right"
-msgstr "Sağ Alt Kısım"
+msgstr "Alt Sağ"
 
 msgid "Hide"
 msgstr "Gizli"
 
+msgid "Overlay Script"
+msgstr "Korumalı Alışveriş"
+
+msgid "Installment"
+msgstr "Taksit"
+
 msgid "Installment Commission"
-msgstr "Taksit Komisyonu"
+msgstr "Taksit Vade Komisyonu"
 
 msgid "This message will show to the user during checkout."
-msgstr "Bu mesaj kullanıcıya ödeme sayfasında gösterilecektir."
+msgstr "Bu mesaj ödeme sırasında kullanıcıya gösterecektir."
 
 msgid "Pay with your credit card or debit card via iyzico."
-msgstr "iyzico ile kredi kartınız veya banka kartınızla ödeme yapın."
+msgstr "Kredi kartı veya banka kartı ile güvenli ödeme yapabilirsiniz."
 
-msgid "Thank you for your order, please enter your card information in the payment form below to pay with iyzico checkout."
-msgstr "Siparişiniz için teşekkür ederiz, iyzico ile ödeme yapmak için lütfen aşağıdaki ödeme formuna kart bilgilerinizi girin."
+msgid ""
+"Thank you for your order, please click the button below to pay with iyzico "
+"checkout."
+msgstr ""
+"Siparişiniz için teşekkür ederiz, iyzico ile ödemek için Ödeme Formunu Aç "
+"butonuna tıklayarak kart bilgilerinizi girebilirsiniz."
 
-msgid "Pay with Credit/Bank Card"
-msgstr "Kredi/Banka Kartı ile Ödeme"
+msgid ""
+"Thank you for your order, please enter your card information in the payment "
+"form below to pay with iyzico checkout."
+msgstr ""
+"Siparişiniz için teşekkür ederiz, iyzico ile ödemek için aşağıdaki ödeme "
+"formu alanına kart bilgilerinizi girebilirsiniz. "
+
+msgid "Pay With Card"
+msgstr "Kredi/Banka Kartı ile Öde"
 
 msgid "Order Status"
 msgstr "Sipariş Durumu"
@@ -69,17 +89,20 @@ msgstr "Sipariş Durumu"
 msgid "Recommended, Default"
 msgstr "Önerilen, Varsayılan"
 
+msgid "Siparişi onayla"
+msgstr "Kredi/Banka Kartı ile Öde"
+
 msgid "Default"
 msgstr "Varsayılan"
 
 msgid "Pending"
-msgstr "Beklemede"
+msgstr "Ödeme Bekleniyor"
 
 msgid "Processing"
-msgstr "Hazırlanıyor"
+msgstr "İşleniyor"
 
 msgid "On-Hold"
-msgstr "Bekletiliyor"
+msgstr "Beklemede"
 
 msgid "Completed"
 msgstr "Tamamlandı"
@@ -93,26 +116,74 @@ msgstr "İade Edildi"
 msgid "Failed"
 msgstr "Başarısız"
 
+msgid "iyzico Protected Shopping, Shipping Tracking"
+msgstr "iyzico Korumalı Alışveriş, Kargo Takibi"
+
+msgid ""
+"By entering the shipping tracking number of this order, you can ensure your "
+"customer have real time order tracking."
+msgstr ""
+"Siparişin kargo takip numarasını girerek, müşterinizin anlık kargo takibi "
+"yapmasını sağlayabilirsiniz."
+
 msgid "Select"
-msgstr "Select"
+msgstr "Seçiniz"
+
+msgid "Shipping Company"
+msgstr "Kargo Firması"
+
+msgid "Shipping Tracking Number"
+msgstr "Kargo Takip Numarası"
 
 msgid "Pay with iyzico"
 msgstr "iyzico ile Öde"
 
 msgid "Best Payment Solution"
-msgstr "En İyi İşletmeler için En İyi Ödeme Çözümü"
+msgstr "En iyi İşletmeler için En iyi Ödeme Çözümleri"
 
-msgid "Buyer Protection - Logo"
-msgstr "Alıcı Koruması - Logo"
+msgid "Korumalı Alışveriş - Logo"
+msgstr "Korumalı Alışveriş - Logo"
 
 msgid "Pay with Bank/Debit Card"
-msgstr "Kredi/Banka Kartı ile Ödeme"
+msgstr "Banka/Kredi Kartı ile Öde"
+
+msgid "Banka/Kredi Kartı ile Öde"
+msgstr "Banka/Kredi Kartı ile Öde"
+
+msgid "Kredi kartı veya banka kartı ile güvenli ödeme yapabilirsiniz."
+msgstr "Kredi kartı veya banka kartı ile güvenli ödeme yapabilirsiniz."
+
+msgid "Pay with your credit/debit via iyzico"
+msgstr "Kredi ve Banka Kartı ile ödeme yapabilirsiniz."
 
 msgid "iyzico Checkout"
 msgstr "iyzico Ödeme Formu"
 
+msgid "Pay with iyzico-It’s Easy Now!"
+msgstr "Alışverişlerini hızla ve kolayca iyzico ile Öde!"
+
+msgid ""
+"After the integration you will be able to use pay with iyzico (iyzico's "
+"alternative payment method) automatically"
+msgstr ""
+"Entegrasyondan sonra, iyzico (iyzico'nun alternatif ödeme yöntemi) ile "
+"ödemeyi otomatik olarak kullanabileceksiniz."
+
+msgid ""
+"Webhook URL Error! Please, re-install the iyzico plugin after delete the "
+"iyzico plugin. Send an email to entegrasyon@iyzico.com"
+msgstr ""
+"Webhook URL üretilemedi. Lütfen plugini kaldırıp, yeniden kurunuz. Sorun "
+"devam ederse entegrasyon@iyzico.com'a mail atınız."
+
+msgid "Webhook Instructions"
+msgstr "Webhook hakkında bilgi almak için "
+
 msgid "Support"
 msgstr "Destek"
+
+msgid "Automatic"
+msgstr "Otomatik"
 
 msgid "Turkish"
 msgstr "Türkçe"
@@ -120,56 +191,101 @@ msgstr "Türkçe"
 msgid "English"
 msgstr "İngilizce"
 
+msgid "3D security has not been validated for your card."
+msgstr "Kartınız için 3D  güvenliği onaylanmamıştır."
+
 msgid "This controls the description which the user sees during checkout."
-msgstr "Bu, kullanıcının ödeme sırasında gördüğü açıklamayı kontrol eder."
+msgstr "Ödeme sırasında kullanıcın gördüğü açıklamayı kontrol eder."
+
+msgid ""
+"Your application for Shopping Loan has been received. Your application will "
+"be finalized as soon as possible."
+msgstr ""
+"Alışveriş Kredisi için başvurunuz alınmıştır. Başvurunuz, en kısa sürede "
+"sonuçlandırılacaktır."
+
+msgid "*Contact to activate webhook"
+msgstr ""
+"*Problem yaşıyorsanız, iyzico webhook sistemini aktif etmek için iletişime "
+"geçiniz."
 
 msgid "Payment Checkout Value"
-msgstr "Ödeme Sayfası Mesajı"
+msgstr "Ödeme Ekran Mesajı"
+
+msgid "These payment method settings are made through the admin menu."
+msgstr "Bu ödeme yöntemi ayarları yönetici menüsünden yapılmaktadır."
+
+msgid "Click to go to settings."
+msgstr "Ayarlar için tıklayınız."
 
 msgid "Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7."
-msgstr "Paranız iyzico ile güvende! iyzico kartınızı saklayın ve tek tıkla ödemenin keyfini çıkarın. Tüm işlemleriniz iyzico Alıcı Koruması garantisi altındadır. 7/24 canlı destek alın."
+msgstr "iyzico ile Öde-Şimdi Kolay! Alışverişini ister iyzico bakiyenle, ister saklı kartınla, ister havale/EFT yöntemi ile kolayca öde; aklına takılan herhangi bir konuda iyzico Korumalı Alışveriş avantajıyla 7/24 canlı destek al."
+
+msgid "Save Settings"
+msgstr "Ayarları Kaydet"
+
+msgid "Permission denied."
+msgstr "İzin reddedildi."
 
 msgid "Error"
-msgstr "Error"
+msgstr "Hata"
+
+msgid "Checkout Form"
+msgstr "Ödeme Formu"
+
+msgid "Total Earnings (30 Days)"
+msgstr "Toplam Kazanç (30 Günlük)"
+
+msgid "Growth from Last Month"
+msgstr "Geçen Aya Göre Büyüme"
+
+msgid "Total Orders (30 Days)"
+msgstr "Toplam Sipariş (30 Günlük)"
+
+msgid "Last 30 Days Earnings"
+msgstr "Son 30 Günlük Kazanç"
+
+msgid "Growth Compared to Last Month"
+msgstr "Geçen Aya Göre Büyüme"
+
+msgid "Number of Orders in the Last 30 Days"
+msgstr "Son 30 Gündeki Sipariş Sayısı"
 
 msgid "This order will be processed on the iyzico payment page."
-msgstr "Bu sipariş iyzico ödeme sayfasında işleme alınacaktır."
+msgstr "Bu sipariş, iyzico ödeme sayfasında işleme alınacaktır."
+
+msgid "Token Not Found"
+msgstr "Üzgünüm, bir terslik oluştu. Token değeri olmadığından işlemine devam edilemedi."
 
 msgid "Payment token is missing. Please try again or contact the store owner if the problem persists."
-msgstr "Ödeme için TOKEN eksik. Lütfen tekrar deneyin veya sorun devam ederse mağaza sahibiyle iletişime geçin."
+msgstr "Ödemeye ait token bulunamadı. Lütfen tekrar deneyin veya mağaza sahibi ile iletişime geçiniz."
 
 msgid "Payment process failed. Please try again or choose a different payment method."
-msgstr "Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin veya farklı bir ödeme yöntemi seçin."
+msgstr "Ödeme işleme hatası. Lütfen tekrar deneyin veya farklı ödeme seçeneği tekrar deneyiniz."
 
 msgid "An unknown error occurred during the payment process. Please try again."
 msgstr "Ödeme işlemi sırasında bilinmeyen bir hata oluştu. Lütfen tekrar deneyin."
 
 msgid "Currently in the process of applying for a shopping loan."
-msgstr "Ödeme şu anda alışveriş kredisi başvurusu aşamasında."
+msgstr "Alışveriş kredisi başvurusu sürecindedir."
+
+msgid "The shopping loan transaction was completed successfully."
+msgstr "Alışveriş kredisi işlemi başarıyla tamamlandı."
 
 msgid "The shopping credit transaction has been initiated."
 msgstr "Alışveriş kredisi işlemi başlatıldı."
 
 msgid "Refunded %s"
-msgstr "%s İade edildi"
-
-msgid "The shopping loan transaction was completed successfully."
-msgstr "Alışveriş kredisi ödemesi başarıyla tamamlandı."
+msgstr "İade edildi %s"
 
 msgid "The bank transfer transaction was completed successfully."
-msgstr "Banka transferi ödemesi başarıyla tamamlandı."
+msgstr "Banka transfer işlemi başarıyla tamamlandı."
 
 msgid "The balance payment transaction was completed successfully."
-msgstr "Bakiye ödemesi başarıyla tamamlandı."
+msgstr "Bakiye ödeme işlemi başarıyla tamamlandı."
 
 msgid "The BKM Express transaction was completed successfully."
-msgstr "BKM Express ödemesi başarıyla tamamlandı."
+msgstr "BKM Express işlemi başarıyla tamamlandı."
 
 msgid "iyzico Bank transfer/EFT payment is pending."
-msgstr "iyzico Havale/EFT ödemesi bekleniyor."
-
-msgid "Payment Form Language"
-msgstr "Ödeme Formu Dili"
-
-msgid "This payment was confirmed via webhook."
-msgstr "Bu ödeme webhook ile doğrulandı."
+msgstr "iyzico Banka transferi/EFT ödemesi bekleniyor."
