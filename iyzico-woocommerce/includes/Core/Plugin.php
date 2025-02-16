@@ -135,14 +135,14 @@ class Plugin {
 		}
 	}
 
-	public function upgrader_process_complete( $upgrader, $hook_extra ) {
+    public static function upgrader_process_complete($upgrader, $hook_extra)
+    {
+        if ($upgrader instanceof Plugin_Upgrader && false === $upgrader->bulk && array_key_exists('plugin', $hook_extra) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin']) {
+            self::databaseUpdate();
+        }
 
-		if ( $upgrader instanceof Plugin_Upgrader && false === $upgrader->bulk && array_key_exists( 'plugin', $hook_extra ) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin'] ) {
-			call_user_func( array( $this, 'databaseUpdate' ) );
-		}
-
-		if ( $upgrader instanceof Plugin_Upgrader && true === $upgrader->bulk && array_key_exists( 'plugins', $hook_extra ) && in_array( IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true ) ) {
-			call_user_func( array( $this, 'databaseUpdate' ) );
-		}
-	}
+        if ($upgrader instanceof Plugin_Upgrader && true === $upgrader->bulk && array_key_exists('plugins', $hook_extra) && in_array(IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true)) {
+            self::databaseUpdate();
+        }
+    }
 }
