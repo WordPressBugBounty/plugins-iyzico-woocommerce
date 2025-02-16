@@ -116,7 +116,7 @@ class Pwi extends WC_Payment_Gateway {
 
 		// Payment Source Settings
 		$affiliate     = $this->checkoutSettings->findByKey( 'affiliate_network' );
-		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-PWI-3.5.8";
+		$paymentSource = "WOOCOMMERCE|$woocommerce->version|CARRERA-PWI-3.5.18";
 
 		if ( strlen( $affiliate ) > 0 ) {
 			$paymentSource = "$paymentSource|$affiliate";

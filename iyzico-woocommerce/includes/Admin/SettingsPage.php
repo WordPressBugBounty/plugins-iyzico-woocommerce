@@ -42,7 +42,7 @@ class SettingsPage {
                 <div class="iyziBrandWrap">
                     <div class="iyziBrand" style="clear:both;position:absolute;right: 50px;top:440px;display: flex;flex-direction: column;justify-content: center;">
                         <img src=' . PLUGIN_URL . '/assets/images/iyzico_logo.png style="width: 250px;margin-left: auto;">
-                        <p style="text-align:center;"><strong>Version: </strong>3.5.8</p>
+                        <p style="text-align:center;"><strong>Version: </strong>3.5.18</p>
                     </div>
                 </div>';
 		echo $html;

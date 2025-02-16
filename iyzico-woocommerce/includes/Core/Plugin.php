@@ -12,14 +12,14 @@ use Iyzico\IyzipayWoocommerce\Common\Traits\PluginLoader;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 use Iyzico\IyzipayWoocommerce\Pwi\Pwi;
 use Plugin_Upgrader;
-use Exception;
 
-
-class Plugin {
+class Plugin
+{
 
 	use PluginLoader;
 
-	public function run(): void {
+	public function run(): void
+	{
 		$this->loadDependencies();
 		$this->setLocale();
 		$this->defineAdminHooks();
@@ -31,7 +31,8 @@ class Plugin {
 		HighPerformanceOrderStorageSupport::init();
 	}
 
-	private function loadDependencies(): void {
+	private function loadDependencies(): void
+	{
 		require_once PLUGIN_PATH . '/includes/Common/Helpers/BlocksSupport.php';
 		require_once PLUGIN_PATH . '/includes/Common/Helpers/HighPerformanceOrderStorageSupport.php';
 
@@ -50,28 +51,28 @@ class Plugin {
 
 		require_once PLUGIN_PATH . '/includes/Pwi/Pwi.php';
 		require_once PLUGIN_PATH . '/includes/Pwi/BlocksPwiMethod.php';
-
-
 	}
 
-	private function setLocale(): void {
-		load_plugin_textdomain( 'woocommerce-iyzico', false, PLUGIN_LANG_PATH );
+	private function setLocale(): void
+	{
+		load_plugin_textdomain('woocommerce-iyzico', false, PLUGIN_LANG_PATH);
 	}
 
-	private function defineAdminHooks(): void {
-		if ( is_admin() ) {
+	private function defineAdminHooks(): void
+	{
+		if (is_admin()) {
 			add_filter(
-				'plugin_action_links_' . plugin_basename( PLUGIN_BASEFILE ),
-				[ $this, 'actionLinks' ]
+				'plugin_action_links_' . plugin_basename(PLUGIN_BASEFILE),
+				[$this, 'actionLinks']
 			);
 
 			$adminHooks = new AdminHooks();
 			$adminHooks->register();
 		}
-
 	}
 
-	private function definePublicHooks(): void {
+	private function definePublicHooks(): void
+	{
 		$restHooks = new RestHooks();
 		$restHooks->register();
 
@@ -79,76 +80,84 @@ class Plugin {
 		$publicHooks->register();
 	}
 
-	private function initPaymentGateway(): void {
-		add_filter( 'woocommerce_payment_gateways', [ $this, 'addGateways' ] );
+	private function initPaymentGateway(): void
+	{
+		add_filter('woocommerce_payment_gateways', [$this, 'addGateways']);
 	}
 
-	public function addGateways( $methods ) {
+	public function addGateways($methods)
+	{
 		$methods[] = CheckoutForm::class;
 		$methods[] = Pwi::class;
 
 		return $methods;
 	}
 
-	public function actionLinks( $links ): array {
+	public function actionLinks($links): array
+	{
 		$custom_links   = [];
-		$custom_links[] = '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=iyzico' ) . '">' . __( 'Settings', 'woocommerce' ) . '</a>';
-		$custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . __( 'Docs', 'woocommerce' ) . '</a>';
-		$custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">' . __( 'Support', 'woocommerce-iyzico' ) . '</a>';
+		$custom_links[] = '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico') . '">' . __('Settings', 'woocommerce') . '</a>';
+		$custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . __('Docs', 'woocommerce') . '</a>';
+		$custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">' . __('Support', 'woocommerce-iyzico') . '</a>';
 
-		return array_merge( $custom_links, $links );
+		return array_merge($custom_links, $links);
 	}
 
-	private function generateWebhookKey(): void {
-		$uniqueUrlId = substr( base64_encode( time() . mt_rand() ), 15, 6 );
-		$iyziUrlId   = get_option( "iyzicoWebhookUrlKey" );
-		if ( ! $iyziUrlId ) {
-			add_option( "iyzicoWebhookUrlKey", $uniqueUrlId, '', false );
+	private function generateWebhookKey(): void
+	{
+		$uniqueUrlId = substr(base64_encode(time() . mt_rand()), 15, 6);
+		$iyziUrlId   = get_option("iyzicoWebhookUrlKey");
+		if (! $iyziUrlId) {
+			add_option("iyzicoWebhookUrlKey", $uniqueUrlId, '', false);
 		}
 	}
 
-	public static function activate(): void {
+	public static function activate(): void
+	{
 		DatabaseManager::createTables();
-		Plugin::databaseUpdate();
 	}
 
-	public static function deactivate(): void {
+	public static function deactivate(): void
+	{
 		global $wpdb;
 		$logger = new Logger();
-		DatabaseManager::init( $wpdb, $logger );
+		DatabaseManager::init($wpdb, $logger);
 		DatabaseManager::dropTables();
 
-		delete_option( 'iyzico_overlay_token' );
-		delete_option( 'iyzico_overlay_position' );
-		delete_option( 'iyzico_thank_you' );
-		delete_option( 'init_active_webhook_url' );
+		delete_option('iyzico_overlay_token');
+		delete_option('iyzico_overlay_position');
+		delete_option('iyzico_thank_you');
+		delete_option('init_active_webhook_url');
 
 		flush_rewrite_rules();
 	}
 
-    public static function databaseUpdate()
-    {
-        $logger = new Logger();
-        $current_db_version = IYZICO_DB_VERSION;
-        $old_db_version = get_option('iyzico_db_version', '0.0.0');
+	public function upgrader_process_complete($upgrader, $hook_extra)
+	{
+		global $wpdb;
+		$logger = new Logger();
+		DatabaseManager::init($wpdb, $logger);
 
-        $logger->info('Current DB Version: ' . $current_db_version);
-        $logger->info('Old DB Version: ' . $old_db_version);
+		$current_db_version = IYZICO_DB_VERSION;
+		$old_db_version = get_option('iyzico_db_version', '0.0.0');
 
-        if (version_compare($current_db_version, $old_db_version, '>')) {
-            DatabaseManager::updateTables();
-            update_option('iyzico_db_version', IYZICO_DB_VERSION);
-        }
-    }
+		$logger->info('Current DB Version: ' . $current_db_version);
+		$logger->info('Old DB Version: ' . $old_db_version);
 
-    public function upgrader_process_complete($upgrader, $hook_extra)
-    {
-        if ($upgrader instanceof Plugin_Upgrader && false === $upgrader->bulk && array_key_exists('plugin', $hook_extra) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin']) {
-            self::databaseUpdate();
-        }
+		if ($upgrader instanceof Plugin_Upgrader && false === $upgrader->bulk && array_key_exists('plugin', $hook_extra) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin']) {
+			if (version_compare($current_db_version, $old_db_version, '>')) {
+				DatabaseManager::updateTables();
+				update_option('iyzico_db_version', IYZICO_DB_VERSION);
+				$logger->info('Database updated to version ' . $current_db_version);
+			}
+		}
 
-        if ($upgrader instanceof Plugin_Upgrader && true === $upgrader->bulk && array_key_exists('plugins', $hook_extra) && in_array(IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true)) {
-            self::databaseUpdate();
-        }
-    }
+		if ($upgrader instanceof Plugin_Upgrader && true === $upgrader->bulk && array_key_exists('plugins', $hook_extra) && in_array(IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true)) {
+			if (version_compare($current_db_version, $old_db_version, '>')) {
+				DatabaseManager::updateTables();
+				update_option('iyzico_db_version', IYZICO_DB_VERSION);
+				$logger->info('Database updated to version ' . $current_db_version);
+			}
+		}
+	}
 }
