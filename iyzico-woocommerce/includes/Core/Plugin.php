@@ -11,6 +11,7 @@ use Iyzico\IyzipayWoocommerce\Common\Hooks\RestHooks;
 use Iyzico\IyzipayWoocommerce\Common\Traits\PluginLoader;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 use Iyzico\IyzipayWoocommerce\Pwi\Pwi;
+use Plugin_Upgrader;
 
 class Plugin {
 
@@ -106,6 +107,7 @@ class Plugin {
 
 	public static function activate(): void {
 		DatabaseManager::createTables();
+		Plugin::databaseUpdate();
 	}
 
 	public static function deactivate(): void {
@@ -120,5 +122,27 @@ class Plugin {
 		delete_option( 'init_active_webhook_url' );
 
 		flush_rewrite_rules();
+	}
+
+	public static function databaseUpdate()
+	{
+		$current_db_version = IYZICO_DB_VERSION;
+		$old_db_version = get_option('iyzico_db_version', '0.0.0');
+
+		if (version_compare($current_db_version, $old_db_version, '>')) {
+			DatabaseManager::updateTables();
+			update_option('iyzico_db_version', IYZICO_DB_VERSION);
+		}
+	}
+
+	public function upgrader_process_complete( $upgrader, $hook_extra ) {
+
+		if ( $upgrader instanceof Plugin_Upgrader && false === $upgrader->bulk && array_key_exists( 'plugin', $hook_extra ) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin'] ) {
+			call_user_func( array( $this, 'databaseUpdate' ) );
+		}
+
+		if ( $upgrader instanceof Plugin_Upgrader && true === $upgrader->bulk && array_key_exists( 'plugins', $hook_extra ) && in_array( IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true ) ) {
+			call_user_func( array( $this, 'databaseUpdate' ) );
+		}
 	}
 }

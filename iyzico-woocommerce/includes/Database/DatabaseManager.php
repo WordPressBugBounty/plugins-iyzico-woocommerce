@@ -159,5 +159,48 @@ class DatabaseManager {
 		);
 	}
 
+	public static function updateTables(): void
+	{
+		self::ensureInitialized();
+		try {
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'iyzico_order';
+
+			$table_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					"SHOW TABLES LIKE %s",
+					$table_name
+				)
+			);
+
+			if ($table_exists) {
+				$conversation_id_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'conversation_id'");
+				if (empty($conversation_id_exists)) {
+					$wpdb->query("ALTER TABLE {$table_name} ADD conversation_id VARCHAR(50) NULL AFTER status");
+				}
+
+				$token_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'token'");
+				if (empty($token_exists)) {
+					$wpdb->query("ALTER TABLE {$table_name} ADD token VARCHAR(100) NULL AFTER conversation_id");
+				}
+
+				$payment_status_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'payment_status'");
+				if (empty($payment_status_exists)) {
+					$wpdb->query("ALTER TABLE {$table_name} ADD payment_status VARCHAR(50) NULL AFTER token");
+				}
+
+				$wpdb->query("ALTER TABLE {$table_name} MODIFY payment_id VARCHAR(50) NULL");
+				$wpdb->query("ALTER TABLE {$table_name} MODIFY conversation_id VARCHAR(50) NULL");
+				$wpdb->query("ALTER TABLE {$table_name} MODIFY token VARCHAR(100) NULL");
+
+				self::$logger->info('Table columns added and modified successfully');
+			} else {
+				self::$logger->error('iyzico_order table does not exist');
+			}
+		} catch (Exception $e) {
+			self::$logger->error('Error updating tables: ' . $e->getMessage());
+		}
+	}
+
 
 }
