@@ -126,25 +126,28 @@ class Plugin {
 		flush_rewrite_rules();
 	}
 
-	public static function databaseUpdate()
+    public static function databaseUpdate()
     {
         $logger = new Logger();
+        $current_db_version = IYZICO_DB_VERSION;
+        $old_db_version = get_option('iyzico_db_version', '0.0.0');
 
-        try {
+        $logger->info('Current DB Version: ' . $current_db_version);
+        $logger->info('Old DB Version: ' . $old_db_version);
+
+        if (version_compare($current_db_version, $old_db_version, '>')) {
             DatabaseManager::updateTables();
             update_option('iyzico_db_version', IYZICO_DB_VERSION);
-            $logger->info('Database updated to version: ' . IYZICO_DB_VERSION);
-        } catch (Exception $e) {
-            $logger->error('Database update failed: ' . $e->getMessage());
         }
     }
 
-	public static function upgrader_process_complete($upgrader, $hook_extra)
+    public function upgrader_process_complete($upgrader, $hook_extra)
     {
-        if ($upgrader instanceof Plugin_Upgrader &&
-            ((false === $upgrader->bulk && array_key_exists('plugin', $hook_extra) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin']) ||
-                (true === $upgrader->bulk && array_key_exists('plugins', $hook_extra) && in_array(IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true)))) {
+        if ($upgrader instanceof Plugin_Upgrader && false === $upgrader->bulk && array_key_exists('plugin', $hook_extra) && IYZICO_PLUGIN_BASENAME === $hook_extra['plugin']) {
+            self::databaseUpdate();
+        }
 
+        if ($upgrader instanceof Plugin_Upgrader && true === $upgrader->bulk && array_key_exists('plugins', $hook_extra) && in_array(IYZICO_PLUGIN_BASENAME, $hook_extra['plugins'], true)) {
             self::databaseUpdate();
         }
     }
