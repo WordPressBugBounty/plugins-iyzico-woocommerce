@@ -12,7 +12,7 @@
  * Plugin Name: iyzico WooCommerce
  * Plugin URI: https://wordpress.org/plugins/iyzico-woocommerce
  * Description: iyzico Payment Gateway for WooCommerce.
- * Version: 3.5.13
+ * Version: 3.5.14
  * Requires at least: 6.6.2
  * WC requires at least: 9.3.3
  * Requires PHP: 7.4.33
@@ -36,8 +36,8 @@ defined('ABSPATH') || exit;
  *
  * These constants are used to define the plugin version, base file, path, url and language path.
  */
-const IYZICO_PLUGIN_VERSION = '3.5.13';
-const IYZICO_DB_VERSION = '1.0.1';
+const IYZICO_PLUGIN_VERSION = '3.5.14';
+const IYZICO_DB_VERSION = '1.0.2';
 const PLUGIN_BASEFILE = __FILE__;
 
 define('PLUGIN_PATH', untrailingslashit(plugin_dir_path(PLUGIN_BASEFILE)));
