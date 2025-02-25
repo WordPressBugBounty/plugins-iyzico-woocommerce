@@ -1,10 +1,10 @@
 === iyzico WooCommerce ===
 Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir,tarikkamat
 Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico
-Tested up to: 6.6.2
-Stable tag: 3.5.18
+Tested up to: 6.7.2
+Stable tag: 3.5.19
 Requires at least: 6.6.2
-Requires PHP: 8.2.0
+Requires PHP: 7.4.33
 License: LGPL v3.0
 License URI: https://www.gnu.org/licenses/lgpl-3.0.en.html
 
@@ -36,7 +36,7 @@ Check out some of other advantages of iyzico WooCommerce Modul from below;
 
 
 Requirements
-PHP 8.2 and greater.
+PHP 7.4.33 and greater.
 cURL
 WooCommerce 9.0.0 requires WordPress 6.6.2+
 
@@ -57,6 +57,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 7. Order Management
 
 == Changelog ==
+
+= 3.5.19 =
+  * Fix : Table migration
 
 = 3.5.18 =
   * Fix : Table migration
@@ -248,6 +251,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 
 == Changelog ==
 
+= 3.5.19 =
+  * Fix : Table migration
+
 = 3.5.18 =
   * Fix : Table migration
 
@@ -272,10 +278,10 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 = 3.5.11 =
   * Fix : Table bug fixes
 
-= 3.5.10 =
+= 3.5. =
   * Fix : Table bug fixes
 
-= 3.5.9 =
+= 3.5.10 =
   * Fix : Table bug fixes
 
 = 3.5.8 =
