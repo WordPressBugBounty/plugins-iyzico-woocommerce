@@ -49,7 +49,7 @@ abstract class Config
                         'Pay with your credit card or debit card via iyzico.',
                         'iyzico-woocommerce'
                     ),
-                    'icon' => PLUGIN_ASSETS_DIR_URL . '/images/cards_v2.png',
+                    'icon' => IYZICO_PLUGIN_ASSETS_DIR_URL . '/images/cards_v2.png',
                     'success_status' => 'processing',
                     'overlay_script' => 'left',
                     'form_class' => 'popup',
@@ -60,7 +60,7 @@ abstract class Config
                 ),
                 'woocommerce_pwi_settings' => array(
                     'enabled' => 'yes',
-                    'icon' => PLUGIN_ASSETS_DIR_URL . '/images/iyzico.png',
+                    'icon' => IYZICO_PLUGIN_ASSETS_DIR_URL . '/images/iyzico.png',
                     'title' => __('Pay with iyzico', 'iyzico-woocommerce'),
                     'button_text' => __('Pay with iyzico', 'iyzico-woocommerce'),
                     'description' => __(

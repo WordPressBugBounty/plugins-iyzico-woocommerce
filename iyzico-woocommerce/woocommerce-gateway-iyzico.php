@@ -3,16 +3,16 @@
 /**
  * iyzipay WooCommerce
  *
- * @package iyzico WooCommerce
+ * @package iyzico for WooCommerce
  * @author iyzico
  * @copyright 2024 iyzico
  * @license LGPL-3.0-or-later
  *
  * @wordpress-plugin
- * Plugin Name: iyzico WooCommerce
+ * Plugin Name: iyzico for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/iyzico-woocommerce
  * Description: iyzico Payment Gateway for WooCommerce.
- * Version: 3.5.19
+ * Version: 3.5.20
  * Requires at least: 6.6.2
  * WC requires at least: 9.3.3
  * Requires PHP: 7.4.33
@@ -35,15 +35,15 @@ defined('ABSPATH') || exit;
  *
  * These constants are used to define the plugin version, base file, path, url and language path.
  */
-const IYZICO_PLUGIN_VERSION = '3.5.19';
-const IYZICO_DB_VERSION = '3.5.19';
+const IYZICO_PLUGIN_VERSION = '3.5.20';
+const IYZICO_DB_VERSION = '3.5.20';
 const PLUGIN_BASEFILE = __FILE__;
 
 define('PLUGIN_PATH', untrailingslashit(plugin_dir_path(PLUGIN_BASEFILE)));
 define('PLUGIN_URL', untrailingslashit(plugin_dir_url(PLUGIN_BASEFILE)));
 define('PLUGIN_LANG_PATH', plugin_basename(dirname(PLUGIN_BASEFILE)) . '/i18n/languages/');
-define('PLUGIN_ASSETS_DIR_URL', plugin_dir_url(__FILE__) . 'assets');
-define('PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
+define('IYZICO_PLUGIN_ASSETS_DIR_URL', plugin_dir_url(__FILE__) . 'assets');
+define('IYZICO_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
 define('IYZICO_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
@@ -64,5 +64,12 @@ register_deactivation_hook(PLUGIN_BASEFILE, ['\Iyzico\IyzipayWoocommerce\Core\Pl
 
 /**
  * Initialize the plugin
+ * 
+ * We first load textdomain at plugin_loaded with priority 0 
+ * Then initialize the plugin with init hook to make sure translations are loaded before any strings are used
  */
-add_action('plugins_loaded', ['\Iyzico\IyzipayWoocommerce\Core\Plugin', 'init']);
+add_action('plugins_loaded', function(){
+    load_plugin_textdomain('iyzico-woocommerce', false, PLUGIN_LANG_PATH);
+}, 0);
+
+add_action('init', ['\Iyzico\IyzipayWoocommerce\Core\Plugin', 'init'], 0);

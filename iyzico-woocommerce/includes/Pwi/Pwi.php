@@ -101,7 +101,7 @@ class Pwi extends WC_Payment_Gateway
         $order = wc_get_order($orderId);
         $checkoutData = $this->pwiDataFactory->prepareCheckoutData($customer, $order, $cart);
         $currency = get_woocommerce_currency();
-        $price = $this->pwiDataFactory->createPrice($order, $cart);
+        $price = $this->pwiDataFactory->createPrice($checkoutData['basketItems']);
         $paidPrice = $this->priceHelper->priceParser(round($order->get_total(), 2));
         $callbackUrl = add_query_arg('wc-api', 'iyzipay', $order->get_checkout_order_received_url());
         $conversationId = uniqid(strval($orderId));

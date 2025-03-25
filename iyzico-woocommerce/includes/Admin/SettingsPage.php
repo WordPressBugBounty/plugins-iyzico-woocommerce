@@ -25,13 +25,16 @@ class SettingsPage
                 <div class="iyziBrandLogo"></div>
                 <p style="text-align:center;"><strong>Version: </strong>' . esc_html(IYZICO_PLUGIN_VERSION) . '</p>
             </div>
-        </div>';
+        </div>
+       ';
 
         $allowed_html = [
             'style' => [],
             'div' => ['class' => [], 'id' => [], 'style' => []],
             'p' => ['style' => []],
             'strong' => [],
+            'button' => ['type' => [], 'id' => [], 'class' => []],
+            'script' => [],
         ];
 
         echo wp_kses($html, $allowed_html);

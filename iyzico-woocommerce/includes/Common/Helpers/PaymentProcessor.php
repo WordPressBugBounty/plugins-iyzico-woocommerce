@@ -48,7 +48,9 @@ class PaymentProcessor
             $paymentStatus = $checkoutFormResult->getPaymentStatus();
 
             if ($paymentStatus === "FAILURE") {
-                $this->redirectToPaymentPage($order);
+                $errorMessage = is_null($checkoutFormResult->getErrorMessage()) ? "Payment failed." : $checkoutFormResult->getErrorMessage();
+                $order->update_status("failed", $errorMessage);
+                $this->redirectToPaymentPage($errorMessage);
             }
 
             $checkoutFormResult = CheckoutFormMapper::create($checkoutFormResult)->mapCheckoutForm($checkoutFormResult);
@@ -123,15 +125,21 @@ class PaymentProcessor
         return $order;
     }
 
-    private function redirectToPaymentPage(WC_Order $order)
+    private function redirectToPaymentPage(string $errorMessage): void
     {
-        $orderId = $order->get_id();
-        if ($orderId) {
-            $paymentUrl = $order->get_checkout_payment_url(true);
-            wp_redirect($paymentUrl);
-        } else {
-            wp_redirect(wc_get_checkout_url() . '?payment=failed');
+        global $woocommerce;
+
+        if ($woocommerce !== null) {
+            $woocommerce->session->set('iyzico_error', $errorMessage);
         }
+
+        $checkoutUrl = wc_get_checkout_url();
+        $redirectUrl = add_query_arg([
+            'payment' => 'failed',
+            'msg' => urlencode($errorMessage)
+        ], $checkoutUrl);
+
+        wp_redirect($redirectUrl);
         exit;
     }
 
@@ -155,7 +163,7 @@ class PaymentProcessor
             return;
         }
 
-        $message = "Payment ID: " . $checkoutFormResult->getPaymentId();
+        $message = "Payment ID: " . $checkoutFormResult->getPaymentId() . " Conversation ID: " . $checkoutFormResult->getConversationId();
         $order->add_order_note($message, 0, true);
 
         if ($this->checkoutSettings->findByKey('api_type') === "https://sandbox-api.iyzipay.com") {
@@ -195,9 +203,9 @@ class PaymentProcessor
             $installmentFee = $response->getPaidPrice() - $orderTotal;
             $itemFee = new WC_Order_Item_Fee();
             $itemFee->set_name($response->getInstallment() . " " . __(
-                    "Installment Commission",
-                    'iyzico-woocommerce'
-                ));
+                "Installment Commission",
+                'iyzico-woocommerce'
+            ));
             $itemFee->set_amount($installmentFee);
             $itemFee->set_tax_class('');
             $itemFee->set_tax_status('none');
@@ -292,8 +300,12 @@ class PaymentProcessor
     private function handleException(Exception $e): void
     {
         $this->logger->error('PaymentProcessor.php: ' . $e->getMessage());
-        WC()->session->set('iyzico_error', $e->getMessage());
+        if (WC()->session !== null) {
+            WC()->session->set('iyzico_error', $e->getMessage());
+            wc_add_notice($e->getMessage(), 'error');
+        }
         wp_redirect(wc_get_checkout_url() . '?payment=failed');
+        exit;
     }
 
     public function processWebhook($response)

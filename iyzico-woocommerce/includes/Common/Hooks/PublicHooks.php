@@ -19,7 +19,6 @@ class PublicHooks
         $this->checkoutForm = new CheckoutForm();
         $this->buyerProtection = new BuyerProtection();
         $this->webhookHelper = new WebhookHelper();
-
     }
 
     public function register()

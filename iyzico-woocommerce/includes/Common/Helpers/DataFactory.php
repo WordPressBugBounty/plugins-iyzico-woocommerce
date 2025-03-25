@@ -126,8 +126,9 @@ class DataFactory
             $shippingItem->setName('Shipping');
             $shippingItem->setCategory1('Shipping');
             $shippingItem->setItemType(BasketItemType::PHYSICAL);
-            $shippingPrice = strval(floatval($order->get_shipping_total()) + floatval($order->get_shipping_tax()));
-            $shippingItem->setPrice($shippingPrice);
+            $shippingItemRealPrice = floatval($order->get_shipping_total()) + floatval($order->get_shipping_tax());
+            $shippingItemPrice = $this->priceHelper->priceParser(round($shippingItemRealPrice, 2));
+            $shippingItem->setPrice($shippingItemPrice);
             $basketItems[] = $shippingItem;
         }
 
@@ -207,32 +208,12 @@ class DataFactory
         return $basketItems;
     }
 
-    public function createPrice(WC_Order $order, array $cart)
+    public function createPrice(array $cart)
     {
         $price = 0.00;
-        $isShippingPriceIncluded = $this->orderHasShippingPrice($order);
-
-        if ($isShippingPriceIncluded) {
-            $shippingPrice = floatval($order->get_shipping_total()) + floatval($order->get_shipping_tax());
-            $price += $shippingPrice;
-        }
-
-        $itemSize = count($cart);
-        if (!$itemSize) {
-            $price += round($order->get_total(), 2);
-        }
-
-        foreach ($cart as $item) {
-            $product = $item['data'];
-            if (!$product) {
-                continue;
-            }
-
-
-            $price += round($item['quantity'] * $this->priceHelper->realPrice(
-                    $product->get_sale_price(),
-                    $product->get_price()
-                ), 2);
+        
+        foreach($cart as $item){
+            $price += (float)$item->getPrice();
         }
 
         return $this->priceHelper->priceParser(round($price, 2));

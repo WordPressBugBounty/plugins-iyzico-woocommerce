@@ -10,7 +10,6 @@ use Iyzico\IyzipayWoocommerce\Common\Hooks\PublicHooks;
 use Iyzico\IyzipayWoocommerce\Common\Traits\PluginLoader;
 use Iyzico\IyzipayWoocommerce\Database\DatabaseManager;
 use Iyzico\IyzipayWoocommerce\Pwi\Pwi;
-use Plugin_Upgrader;
 
 class Plugin
 {
@@ -41,7 +40,6 @@ class Plugin
     public function run()
     {
         $this->loadDependencies();
-        $this->setLocale();
         $this->defineAdminHooks();
         $this->definePublicHooks();
         $this->initPaymentGateway();
@@ -70,13 +68,6 @@ class Plugin
 
         require_once PLUGIN_PATH . '/includes/Pwi/Pwi.php';
         require_once PLUGIN_PATH . '/includes/Pwi/BlocksPwiMethod.php';
-    }
-
-    private function setLocale()
-    {
-        add_action('init', function () {
-            load_plugin_textdomain('iyzico-woocommerce', false, PLUGIN_LANG_PATH);
-        });
     }
 
     private function defineAdminHooks()
@@ -133,15 +124,15 @@ class Plugin
     public function actionLinks($links): array
     {
         $custom_links = [];
-        $custom_links[] = '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico') . '">' . __(
-                'Settings',
-                'iyzico-woocommerce'
-            ) . '</a>';
-        $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . __('Docs', 'iyzico-woocommerce') . '</a>';
-        $custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">' . __(
-                'Support',
-                'iyzico-woocommerce'
-            ) . '</a>';
+        $custom_links[] = '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico') . '">' . esc_html__(
+            'Settings',
+            'iyzico-woocommerce'
+        ) . '</a>';
+        $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . esc_html__('Docs', 'iyzico-woocommerce') . '</a>';
+        $custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">' . esc_html__(
+            'Support',
+            'iyzico-woocommerce'
+        ) . '</a>';
 
         return array_merge($custom_links, $links);
     }

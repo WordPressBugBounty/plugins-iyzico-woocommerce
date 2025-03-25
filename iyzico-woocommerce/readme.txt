@@ -1,8 +1,8 @@
-=== iyzico WooCommerce ===
+=== iyzico for WooCommerce ===
 Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir,tarikkamat
 Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico
 Tested up to: 6.7.2
-Stable tag: 3.5.19
+Stable tag: 3.5.20
 Requires at least: 6.6.2
 Requires PHP: 7.4.33
 License: LGPL v3.0
@@ -57,6 +57,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 7. Order Management
 
 == Changelog ==
+
+= 3.5.20 =
+  * Fix : Bug fix.
 
 = 3.5.19 =
   * Fix : Table migration
@@ -250,6 +253,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 == Upgrade Notice ==
 
 == Changelog ==
+
+= 3.5.20 =
+  * Fix : Bug fix.
 
 = 3.5.19 =
   * Fix : Table migration
