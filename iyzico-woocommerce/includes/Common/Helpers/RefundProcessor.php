@@ -67,7 +67,7 @@ class RefundProcessor
             $order = new WC_Order($orderId);
             $order->add_order_note(
             /* translators: %s: refunded amount */
-                sprintf(__('Refunded %s', 'iyzico-woocommerce'), $amount)
+                sprintf(__('Refunded %s', 'woocommerce-iyzico'), $amount)
             );
 
             $this->logger->info('RefundProcessor: Refund successful for order ' . $orderId);

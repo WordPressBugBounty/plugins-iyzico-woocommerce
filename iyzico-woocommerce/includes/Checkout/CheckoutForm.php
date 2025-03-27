@@ -41,8 +41,8 @@ class CheckoutForm extends WC_Payment_Gateway
     public function __construct()
     {
         $this->id = "iyzico";
-        $this->method_title = __('iyzico Checkout', 'iyzico-woocommerce');
-        $this->method_description = __('Best Payment Solution', 'iyzico-woocommerce');
+        $this->method_title = __('iyzico Checkout', 'woocommerce-iyzico');
+        $this->method_description = __('Best Payment Solution', 'woocommerce-iyzico');
 
         $this->checkoutSettings = new CheckoutSettings();
         $this->form_fields = $this->checkoutSettings->getFormFields();
@@ -123,7 +123,7 @@ class CheckoutForm extends WC_Payment_Gateway
             if ($formType === 'redirect') {
                 $this->order->add_order_note(__(
                     "This order will be processed on the iyzico payment page.",
-                    "iyzico-woocommerce"
+                    "woocommerce-iyzico"
                 ));
                 $checkoutFormInitialize = $this->create_payment($order_id);
                 $paymentPageUrl = $checkoutFormInitialize->getPaymentPageUrl();
@@ -228,7 +228,7 @@ class CheckoutForm extends WC_Payment_Gateway
         if (strlen($paymentPageUrl) === 0) {
             wc_add_notice(__(
                 "An unknown error occurred during the payment process. Please try again.",
-                "iyzico-woocommerce"
+                "woocommerce-iyzico"
             ), 'error');
             return [
                 'result' => 'failure'

@@ -126,12 +126,12 @@ class Plugin
         $custom_links = [];
         $custom_links[] = '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico') . '">' . esc_html__(
             'Settings',
-            'iyzico-woocommerce'
+            'woocommerce-iyzico'
         ) . '</a>';
-        $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . esc_html__('Docs', 'iyzico-woocommerce') . '</a>';
+        $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . esc_html__('Docs', 'woocommerce-iyzico') . '</a>';
         $custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">' . esc_html__(
             'Support',
-            'iyzico-woocommerce'
+            'woocommerce-iyzico'
         ) . '</a>';
 
         return array_merge($custom_links, $links);

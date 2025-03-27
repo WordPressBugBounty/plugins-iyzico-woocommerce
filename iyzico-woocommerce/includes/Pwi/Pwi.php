@@ -39,8 +39,8 @@ class Pwi extends WC_Payment_Gateway
     public function __construct()
     {
         $this->id = "pwi";
-        $this->method_title = __('Pay with iyzico', 'iyzico-woocommerce');
-        $this->method_description = __('Best Payment Solution', 'iyzico-woocommerce');
+        $this->method_title = __('Pay with iyzico', 'woocommerce-iyzico');
+        $this->method_description = __('Best Payment Solution', 'woocommerce-iyzico');
         $this->pwiSettings = new PwiSettings();
         $this->form_fields = $this->pwiSettings->getFormFields();
         $this->init_settings();
@@ -76,7 +76,7 @@ class Pwi extends WC_Payment_Gateway
             $this->order->set_payment_method('iyzico');
             $this->order->add_order_note(__(
                 "This order will be processed on the iyzico payment page.",
-                "iyzico-woocommerce"
+                "woocommerce-iyzico"
             ));
 
             $pwiInitialize = $this->create_payment($order_id);
