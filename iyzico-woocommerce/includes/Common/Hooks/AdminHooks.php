@@ -7,33 +7,37 @@ use Iyzico\IyzipayWoocommerce\Pwi\Pwi;
 
 class AdminHooks
 {
+    private $checkoutForm = null;
+    private $pwi = null;
 
-	private $checkoutForm;
-	private $pwi;
+    public function register(): void
+    {
+        add_action('woocommerce_update_options_payment_gateways_iyzico', function () {
+            $this->getCheckoutForm()->process_admin_options();
+        });
 
-	public function __construct()
-	{
-		$this->checkoutForm = new CheckoutForm();
-		$this->pwi = new Pwi();
-	}
+        add_action('woocommerce_update_options_payment_gateways_pwi', function () {
+            $this->getPwi()->process_admin_options();
+        });
 
-	public function register(): void
-	{
-		add_action('woocommerce_update_options_payment_gateways_' . $this->checkoutForm->id, [
-			$this->checkoutForm,
-			'process_admin_options'
-		]);
+        add_action('woocommerce_update_options_payment_gateways_iyzico', function () {
+            $this->getCheckoutForm()->admin_overlay_script();
+        });
+    }
 
-		add_action('woocommerce_update_options_payment_gateways_' . $this->pwi->id, [
-			$this->pwi,
-			'process_admin_options'
-		]);
+    private function getCheckoutForm()
+    {
+        if ($this->checkoutForm === null) {
+            $this->checkoutForm = new CheckoutForm();
+        }
+        return $this->checkoutForm;
+    }
 
-		add_action('woocommerce_update_options_payment_gateways_' . $this->checkoutForm->id, [
-			$this->checkoutForm,
-			'admin_overlay_script'
-		]);
-	}
-
-
+    private function getPwi()
+    {
+        if ($this->pwi === null) {
+            $this->pwi = new Pwi();
+        }
+        return $this->pwi;
+    }
 }

@@ -63,7 +63,7 @@ class DataFactory
         $buyer->setEmail($this->validateStringVal($order->get_billing_email()));
         $buyer->setRegistrationDate(gmdate('Y-m-d H:i:s'));
         $buyer->setLastLoginDate(gmdate('Y-m-d H:i:s'));
-        $buyer->setRegistrationAddress($this->validateStringVal($order->get_billing_address_1()) . ' ' . $this->validateStringVal($order->get_billing_address_2()));
+        $buyer->setRegistrationAddress($this->validateStringVal($order->get_billing_address_1()).' '.$this->validateStringVal($order->get_billing_address_2()));
         $buyer->setCity($this->validateStringVal($order->get_billing_city()));
         $buyer->setCountry($this->validateStringVal($order->get_billing_country()));
         $buyer->setZipCode($this->validateStringVal($order->get_billing_postcode()));
@@ -96,13 +96,13 @@ class DataFactory
 
         $firstName = $this->validateStringVal($isTypeBilling ? $order->get_billing_first_name() : $order->get_shipping_first_name());
         $lastName = $this->validateStringVal($isTypeBilling ? $order->get_billing_last_name() : $order->get_shipping_last_name());
-        $contactName = $firstName . ' ' . $lastName;
+        $contactName = $firstName.' '.$lastName;
 
         $city = $this->validateStringVal($isTypeBilling ? $order->get_billing_city() : $order->get_shipping_city());
         $country = $this->validateStringVal($isTypeBilling ? $order->get_billing_country() : $order->get_shipping_country());
         $address1 = $this->validateStringVal($isTypeBilling ? $order->get_billing_address_1() : $order->get_shipping_address_1());
         $address2 = $this->validateStringVal($isTypeBilling ? $order->get_billing_address_2() : $order->get_shipping_address_2());
-        $fullAddress = trim($address1 . ' ' . $address2);
+        $fullAddress = trim($address1.' '.$address2);
         $zipCode = $isTypeBilling ? $order->get_billing_postcode() : $order->get_shipping_postcode();
 
         $address = new Address();
@@ -151,11 +151,11 @@ class DataFactory
             }
 
             if (get_class($product) === 'WC_Product_Variation') {
-                $basketItemId = $this->validateStringVal(isset($item['variation_id']) && $item['variation_id'] ? (string)$item['variation_id'] : (string)$item['product_id']);
+                $basketItemId = $this->validateStringVal(isset($item['variation_id']) && $item['variation_id'] ? (string) $item['variation_id'] : (string) $item['product_id']);
             }
 
             if ($basketItemId === 'UNKNOWN') {
-                $basketItemId = $this->validateStringVal(isset($item['product_id']) && $item['product_id'] ? (string)$item['product_id'] : (string)$product->get_sku());
+                $basketItemId = $this->validateStringVal(isset($item['product_id']) && $item['product_id'] ? (string) $item['product_id'] : (string) $product->get_sku());
             }
 
             $basketItem->setId($this->validateStringVal($basketItemId));
@@ -211,9 +211,9 @@ class DataFactory
     public function createPrice(array $cart)
     {
         $price = 0.00;
-        
-        foreach($cart as $item){
-            $price += (float)$item->getPrice();
+
+        foreach ($cart as $item) {
+            $price += (float) $item->getPrice();
         }
 
         return $this->priceHelper->priceParser(round($price, 2));

@@ -39,8 +39,8 @@ class Pwi extends WC_Payment_Gateway
     public function __construct()
     {
         $this->id = "pwi";
-        $this->method_title = __('Pay with iyzico', 'woocommerce-iyzico');
-        $this->method_description = __('Best Payment Solution', 'woocommerce-iyzico');
+        $this->method_title = 'Pay with iyzico';
+        $this->method_description = 'Best Payment Solution';
         $this->pwiSettings = new PwiSettings();
         $this->form_fields = $this->pwiSettings->getFormFields();
         $this->init_settings();
@@ -69,6 +69,24 @@ class Pwi extends WC_Payment_Gateway
         $this->refundProcessor = new RefundProcessor();
     }
 
+    /**
+     * Get translated method title
+     * @return string
+     */
+    public function get_method_title()
+    {
+        return __('Pay with iyzico', 'iyzico-woocommerce');
+    }
+
+    /**
+     * Get translated method description
+     * @return string
+     */
+    public function get_method_description()
+    {
+        return __('Best Payment Solution', 'iyzico-woocommerce');
+    }
+
     public function process_payment($order_id)
     {
         try {
@@ -76,7 +94,7 @@ class Pwi extends WC_Payment_Gateway
             $this->order->set_payment_method('iyzico');
             $this->order->add_order_note(__(
                 "This order will be processed on the iyzico payment page.",
-                "woocommerce-iyzico"
+                "iyzico-woocommerce"
             ));
 
             $pwiInitialize = $this->create_payment($order_id);
@@ -112,7 +130,7 @@ class Pwi extends WC_Payment_Gateway
         $woocommerce->session->set('totalAmount', $order->get_total());
 
         // Payment Source Settings
-        $paymentSource = "WOOCOMMERCE|$woocommerce->version|" . IYZICO_PLUGIN_VERSION;
+        $paymentSource = "WOOCOMMERCE|$woocommerce->version|"."CARRERA-".IYZICO_PLUGIN_VERSION."|PWI";
         $affiliate = $this->checkoutSettings->findByKey('affiliate_network');
         if (strlen($affiliate) > 0) {
             $paymentSource = "$paymentSource|$affiliate";
@@ -149,7 +167,7 @@ class Pwi extends WC_Payment_Gateway
 
         // Check Request Logs Settings
         $isSave = $this->checkoutSettings->findByKey('request_log_enabled');
-        $isSave === 'yes' ? $this->logger->info("CheckoutFormInitialize Request: " . $request->toJsonString()) : null;
+        $isSave === 'yes' ? $this->logger->info("CheckoutFormInitialize Request: ".$request->toJsonString()) : null;
 
         // Payment Initialize Request Response
         $response = PayWithIyzicoInitialize::create($request, $options);
@@ -216,14 +234,20 @@ class Pwi extends WC_Payment_Gateway
             'fieldset' => [],
             'legend' => ['class' => []],
             'label' => ['for' => [], 'class' => []],
-            'input' => ['type' => [], 'name' => [], 'value' => [], 'class' => [], 'id' => [], 'placeholder' => [], 'style' => [], 'checked' => [], 'maxlength' => []],
+            'input' => [
+                'type' => [], 'name' => [], 'value' => [], 'class' => [], 'id' => [], 'placeholder' => [],
+                'style' => [], 'checked' => [], 'maxlength' => []
+            ],
             'select' => ['name' => [], 'class' => [], 'id' => [], 'style' => []],
             'option' => ['value' => [], 'selected' => []],
             'p' => ['class' => [], 'style' => []],
             'strong' => [],
             'span' => ['class' => [], 'aria-label' => [], 'tabindex' => []],
             'button' => ['name' => [], 'class' => [], 'type' => [], 'value' => [], 'disabled' => []],
-            'input' => ['type' => [], 'name' => [], 'value' => [], 'id' => [], 'class' => [], 'style' => [], 'checked' => [], 'maxlength' => []],
+            'input' => [
+                'type' => [], 'name' => [], 'value' => [], 'id' => [], 'class' => [], 'style' => [], 'checked' => [],
+                'maxlength' => []
+            ],
             'div' => ['class' => [], 'id' => [], 'style' => []],
             'img' => ['src' => [], 'style' => []],
             'link' => ['rel' => [], 'href' => [], 'type' => []],

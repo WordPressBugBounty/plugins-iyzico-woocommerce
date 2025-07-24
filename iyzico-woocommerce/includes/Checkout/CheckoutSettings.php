@@ -11,118 +11,121 @@ class CheckoutSettings extends Config
 
     public function __construct()
     {
-        $webhookUrl = get_site_url() . "/wp-json/iyzico/v1/webhook/" . get_option('iyzicoWebhookUrlKey');
+        $webhookUrl = get_site_url()."/wp-json/iyzico/v1/webhook/".get_option('iyzicoWebhookUrlKey');
 
         $this->form_fields = [
             'webhook_url' => [
-                'title' => __('Webhook URL', 'woocommerce-iyzico'),
+                'title' => __('Webhook URL', 'iyzico-woocommerce'),
                 'type' => 'title',
                 'description' => $webhookUrl,
             ],
             'api_type' => [
-                'title' => __('Environment', 'woocommerce-iyzico'),
+                'title' => __('Environment', 'iyzico-woocommerce'),
                 'type' => 'select',
                 'required' => true,
                 'default' => 'https://sandbox-api.iyzipay.com',
                 'options' => [
-                    'https://api.iyzipay.com' => __('Live', 'woocommerce-iyzico'),
-                    'https://sandbox-api.iyzipay.com' => __('Sandbox / Test', 'woocommerce-iyzico')
+                    'https://api.iyzipay.com' => __('Live', 'iyzico-woocommerce'),
+                    'https://sandbox-api.iyzipay.com' => __('Sandbox / Test', 'iyzico-woocommerce')
                 ],
             ],
             'api_key' => [
-                'title' => __('API Key', 'woocommerce-iyzico'),
+                'title' => __('API Key', 'iyzico-woocommerce'),
                 'type' => 'text'
             ],
             'secret_key' => [
-                'title' => __('Secret Key', 'woocommerce-iyzico'),
+                'title' => __('Secret Key', 'iyzico-woocommerce'),
                 'type' => 'text'
             ],
             'title' => [
-                'title' => __('Payment Value', 'woocommerce-iyzico'),
+                'title' => __('Payment Value', 'iyzico-woocommerce'),
                 'type' => 'text',
-                'description' => __('This message will show to the user during checkout.', 'woocommerce-iyzico'),
-                'default' => __('Pay with Bank/Debit Card', 'woocommerce-iyzico')
+                'description' => __('This message will show to the user during checkout.', 'iyzico-woocommerce'),
+                'default' => __('Pay with Bank/Debit Card', 'iyzico-woocommerce')
             ],
             'description' => [
-                'title' => __('Payment Form Description Value', 'woocommerce-iyzico'),
+                'title' => __('Payment Form Description Value', 'iyzico-woocommerce'),
                 'type' => 'text',
-                'description' => __('This controls the description which the user sees during checkout.', 'woocommerce-iyzico'),
-                'default' => __('Pay with your credit card or debit card via iyzico.', 'woocommerce-iyzico')
+                'description' => __('This controls the description which the user sees during checkout.',
+                    'iyzico-woocommerce'),
+                'default' => __('Pay with your credit card or debit card via iyzico.', 'iyzico-woocommerce')
             ],
             'form_class' => [
-                'title' => __('Payment Form Design', 'woocommerce-iyzico'),
+                'title' => __('Payment Form Design', 'iyzico-woocommerce'),
                 'type' => 'select',
                 'default' => 'popup',
                 'options' => [
-                    'responsive' => __('Responsive', 'woocommerce-iyzico'),
-                    'popup' => __('Popup', 'woocommerce-iyzico'),
-                    'redirect' => __('Redirect', 'woocommerce-iyzico')
+                    'responsive' => __('Responsive', 'iyzico-woocommerce'),
+                    'popup' => __('Popup', 'iyzico-woocommerce'),
+                    'redirect' => __('Redirect', 'iyzico-woocommerce')
                 ]
             ],
             'payment_checkout_value' => [
-                'title' => __('Payment Checkout Value', 'woocommerce-iyzico'),
+                'title' => __('Payment Checkout Value', 'iyzico-woocommerce'),
                 'type' => 'text',
-                'description' => __('This controls the description which the user sees during checkout.', 'woocommerce-iyzico'),
+                'description' => __('This controls the description which the user sees during checkout.',
+                    'iyzico-woocommerce'),
                 'default' => __(
                     'Thank you for your order, please enter your card information in the payment form below to pay with iyzico checkout.',
-                    'woocommerce-iyzico'
+                    'iyzico-woocommerce'
                 ),
                 'desc_tip' => true,
             ],
             'order_status' => [
-                'title' => __('Order Status', 'woocommerce-iyzico'),
+                'title' => __('Order Status', 'iyzico-woocommerce'),
                 'type' => 'select',
-                'description' => __('Recommended, Default', 'woocommerce-iyzico'),
+                'description' => __('Recommended, Default', 'iyzico-woocommerce'),
                 'default' => 'default',
                 'options' => [
-                    'default' => __('Default', 'woocommerce-iyzico'),
-                    'pending' => __('Pending', 'woocommerce-iyzico'),
-                    'processing' => __('Processing', 'woocommerce-iyzico'),
-                    'on-hold' => __('On-Hold', 'woocommerce-iyzico'),
-                    'completed' => __('Completed', 'woocommerce-iyzico'),
-                    'cancelled' => __('Cancelled', 'woocommerce-iyzico'),
-                    'refunded' => __('Refunded', 'woocommerce-iyzico'),
-                    'failed' => __('Failed', 'woocommerce-iyzico')
+                    'default' => __('Default', 'iyzico-woocommerce'),
+                    'pending' => __('Pending', 'iyzico-woocommerce'),
+                    'processing' => __('Processing', 'iyzico-woocommerce'),
+                    'on-hold' => __('On-Hold', 'iyzico-woocommerce'),
+                    'completed' => __('Completed', 'iyzico-woocommerce'),
+                    'cancelled' => __('Cancelled', 'iyzico-woocommerce'),
+                    'refunded' => __('Refunded', 'iyzico-woocommerce'),
+                    'failed' => __('Failed', 'iyzico-woocommerce')
                 ]
             ],
             'overlay_script' => [
-                'title' => __('Buyer Protection - Logo', 'woocommerce-iyzico'),
+                'title' => __('Buyer Protection - Logo', 'iyzico-woocommerce'),
                 'type' => 'select',
                 'required' => false,
                 'default' => 'left',
                 'options' => [
-                    'bottomLeft' => __('Left', 'woocommerce-iyzico'),
-                    'bottomRight' => __('Right', 'woocommerce-iyzico'),
-                    'hide' => __('Hide', 'woocommerce-iyzico')
+                    'bottomLeft' => __('Left', 'iyzico-woocommerce'),
+                    'bottomRight' => __('Right', 'iyzico-woocommerce'),
+                    'hide' => __('Hide', 'iyzico-woocommerce')
                 ]
             ],
             'form_language' => [
-                'title' => __('Payment Form Language', 'woocommerce-iyzico'),
+                'title' => __('Payment Form Language', 'iyzico-woocommerce'),
                 'type' => 'select',
                 'required' => true,
                 'default' => 'TR',
                 'options' => [
-                    'TR' => __('Turkish', 'woocommerce-iyzico'),
-                    'EN' => __('English', 'woocommerce-iyzico')
+                    'TR' => __('Turkish', 'iyzico-woocommerce'),
+                    'EN' => __('English', 'iyzico-woocommerce')
                 ]
             ],
             'affiliate_network' => [
-                'title' => __('Affiliate Network', 'woocommerce-iyzico'),
+                'title' => __('Affiliate Network', 'iyzico-woocommerce'),
                 'type' => 'text',
                 'required' => false,
-                'description' => __('Payment source for agency', 'woocommerce-iyzico'),
+                'description' => __('Payment source for agency', 'iyzico-woocommerce'),
                 'default' => '',
                 'custom_attributes' => ['maxlength' => 14]
             ],
             'enabled' => [
-                'title' => __('Enable/Disable', 'woocommerce-iyzico'),
-                'label' => __('Enable iyzico Checkout Form', 'woocommerce-iyzico'),
+                'title' => __('Enable/Disable', 'iyzico-woocommerce'),
+                'label' => __('Enable iyzico Checkout Form', 'iyzico-woocommerce'),
                 'type' => 'checkbox',
                 'default' => 'no'
             ],
             'request_log_enabled' => [
-                'title' => __('Request Log', 'woocommerce-iyzico'),
-                'label' => __('Enable request log', 'woocommerce-iyzico') . " (wp-content/plugins/woocommerce-iyzico/logs_files)",
+                'title' => __('Request Log', 'iyzico-woocommerce'),
+                'label' => __('Enable request log',
+                        'iyzico-woocommerce')." (wp-content/plugins/iyzico-woocommerce/logs_files)",
                 'type' => 'checkbox',
                 'default' => 'no',
             ]

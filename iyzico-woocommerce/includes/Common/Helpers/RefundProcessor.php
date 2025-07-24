@@ -37,7 +37,7 @@ class RefundProcessor
 
 
         if (is_null($order)) {
-            $this->logger->error('RefundProcessor: Order not found for order id ' . $orderId);
+            $this->logger->error('RefundProcessor: Order not found for order id '.$orderId);
 
             return false;
         }
@@ -60,17 +60,19 @@ class RefundProcessor
 
         $response = AmountBaseRefund::create($request, $options);
 
-        $isSave === 'yes' ? $this->logger->info("AmountBaseRefund Request: " . wp_json_encode($request, JSON_PRETTY_PRINT)) : null;
-        $isSave === 'yes' ? $this->logger->info("AmountBaseRefund Response: " . wp_json_encode($response, JSON_PRETTY_PRINT)) : null;
+        $isSave === 'yes' ? $this->logger->info("AmountBaseRefund Request: ".wp_json_encode($request,
+                JSON_PRETTY_PRINT)) : null;
+        $isSave === 'yes' ? $this->logger->info("AmountBaseRefund Response: ".wp_json_encode($response,
+                JSON_PRETTY_PRINT)) : null;
 
         if ($response->getStatus() == 'success') {
             $order = new WC_Order($orderId);
             $order->add_order_note(
             /* translators: %s: refunded amount */
-                sprintf(__('Refunded %s', 'woocommerce-iyzico'), $amount)
+                sprintf(__('Refunded %s', 'iyzico-woocommerce'), $amount)
             );
 
-            $this->logger->info('RefundProcessor: Refund successful for order ' . $orderId);
+            $this->logger->info('RefundProcessor: Refund successful for order '.$orderId);
 
             return true;
         }

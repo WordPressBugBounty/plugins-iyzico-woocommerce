@@ -38,7 +38,7 @@ class CheckoutView
                 esc_attr($className),
                 wp_kses($checkoutFormInitialize->getCheckoutFormContent(), $allowed_html)
             );
-            
+
             $this->renderUiControlScript();
         } else {
             echo esc_html($checkoutFormInitialize->getErrorMessage());

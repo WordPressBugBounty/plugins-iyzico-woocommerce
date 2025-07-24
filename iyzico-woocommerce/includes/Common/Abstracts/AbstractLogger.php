@@ -14,7 +14,7 @@ abstract class AbstractLogger implements LoggerInterface
 
     public function __construct(string $logDir = '')
     {
-        $this->logDir = $logDir ?: PLUGIN_PATH . '/log_files/';
+        $this->logDir = $logDir ?: PLUGIN_PATH.'/log_files/';
         $this->ensureLogDirectoryExists();
     }
 
@@ -23,8 +23,19 @@ abstract class AbstractLogger implements LoggerInterface
         global $wp_filesystem;
 
         if (empty($wp_filesystem)) {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-            WP_Filesystem();
+            require_once ABSPATH.'wp-admin/includes/file.php';
+            $access_type = get_filesystem_method();
+
+            if ($access_type === 'direct') {
+                WP_Filesystem();
+            } else {
+                // Fallback to direct file operations if WP_Filesystem is not available
+                if (!file_exists($this->logDir)) {
+                    wp_mkdir_p($this->logDir);
+                    $this->createHtaccessDirect();
+                }
+                return;
+            }
         }
 
         if (!$wp_filesystem->is_dir($this->logDir)) {
@@ -33,12 +44,19 @@ abstract class AbstractLogger implements LoggerInterface
         }
     }
 
+    protected function createHtaccessDirect(): void
+    {
+        $htaccessContent = "Deny from all\n";
+        $filePath = trailingslashit($this->logDir).'.htaccess';
+        file_put_contents($filePath, $htaccessContent);
+    }
+
     protected function createHtaccess(): void
     {
         global $wp_filesystem;
 
         $htaccessContent = "Deny from all\n";
-        $filePath = trailingslashit($this->logDir) . '.htaccess';
+        $filePath = trailingslashit($this->logDir).'.htaccess';
 
         $wp_filesystem->put_contents($filePath, $htaccessContent, FS_CHMOD_FILE);
     }
@@ -54,9 +72,9 @@ abstract class AbstractLogger implements LoggerInterface
     protected function log(string $file, string $level, string $message)
     {
         $timestamp = gmdate('Y-m-d H:i:s');
-        $logMessage = "[$timestamp] [$level] $message" . PHP_EOL;
+        $logMessage = "[$timestamp] [$level] $message".PHP_EOL;
 
-        $filePath = $this->logDir . $file;
+        $filePath = $this->logDir.$file;
         file_put_contents($filePath, $logMessage, FILE_APPEND | LOCK_EX);
     }
 }

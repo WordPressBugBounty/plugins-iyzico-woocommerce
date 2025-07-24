@@ -25,7 +25,7 @@ class WebhookHelper
         $webhookID = get_option('iyzicoWebhookUrlKey');
 
         if (!$webhookID) {
-            $webhookID = substr(base64_encode(time() . wp_rand()), 15, 6);
+            $webhookID = substr(base64_encode(time().wp_rand()), 15, 6);
             update_option('iyzicoWebhookUrlKey', $webhookID);
         }
 
@@ -39,11 +39,11 @@ class WebhookHelper
     private function handleSuccessfulPayment($data, $isValidateSignature = false)
     {
         if ($isValidateSignature) {
-            $this->logger->webhook("USE X-IYZ-SIGNATURE-V3: " . wp_json_encode($data, JSON_PRETTY_PRINT));
+            $this->logger->webhook("USE X-IYZ-SIGNATURE-V3: ".wp_json_encode($data, JSON_PRETTY_PRINT));
             return $this->paymentProcessor->processWebhookWithSignature($data);
         }
 
-        $this->logger->webhook("NOT USE X-IYZ-SIGNATURE-V3: " . wp_json_encode($data, JSON_PRETTY_PRINT));
+        $this->logger->webhook("NOT USE X-IYZ-SIGNATURE-V3: ".wp_json_encode($data, JSON_PRETTY_PRINT));
 
         return $this->paymentProcessor->processWebhook($data);
     }
@@ -105,7 +105,7 @@ class WebhookHelper
         $token = sanitize_text_field($params['token']);
         $paymentConversationId = sanitize_text_field($params['paymentConversationId']);
         $status = sanitize_text_field($params['status']);
-        $key = $secretKey . $iyziEventType . $iyziPaymentId . $token . $paymentConversationId . $status;
+        $key = $secretKey.$iyziEventType.$iyziPaymentId.$token.$paymentConversationId.$status;
         $hmac256Signature = bin2hex(hash_hmac('sha256', $key, $secretKey, true));
 
         if ($iyzicoSignature === $hmac256Signature) {

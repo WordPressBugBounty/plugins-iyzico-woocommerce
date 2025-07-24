@@ -41,8 +41,8 @@ class CheckoutForm extends WC_Payment_Gateway
     public function __construct()
     {
         $this->id = "iyzico";
-        $this->method_title = __('iyzico Checkout', 'woocommerce-iyzico');
-        $this->method_description = __('Best Payment Solution', 'woocommerce-iyzico');
+        $this->method_title = 'iyzico Checkout';
+        $this->method_description = 'Best Payment Solution';
 
         $this->checkoutSettings = new CheckoutSettings();
         $this->form_fields = $this->checkoutSettings->getFormFields();
@@ -71,6 +71,24 @@ class CheckoutForm extends WC_Payment_Gateway
         $this->adminSettings = new SettingsPage();
         $this->refundProcessor = new RefundProcessor();
 
+    }
+
+    /**
+     * Get translated method title
+     * @return string
+     */
+    public function get_method_title()
+    {
+        return __('iyzico Checkout', 'iyzico-woocommerce');
+    }
+
+    /**
+     * Get translated method description
+     * @return string
+     */
+    public function get_method_description()
+    {
+        return __('Best Payment Solution', 'iyzico-woocommerce');
     }
 
     public function admin_overlay_script()
@@ -123,7 +141,7 @@ class CheckoutForm extends WC_Payment_Gateway
             if ($formType === 'redirect') {
                 $this->order->add_order_note(__(
                     "This order will be processed on the iyzico payment page.",
-                    "woocommerce-iyzico"
+                    "iyzico-woocommerce"
                 ));
                 $checkoutFormInitialize = $this->create_payment($order_id);
                 $paymentPageUrl = $checkoutFormInitialize->getPaymentPageUrl();
@@ -165,7 +183,7 @@ class CheckoutForm extends WC_Payment_Gateway
         $woocommerce->session->set('totalAmount', $order->get_total());
 
         // Payment Source Settings
-        $paymentSource = "WOOCOMMERCE|$woocommerce->version|" . IYZICO_PLUGIN_VERSION;
+        $paymentSource = "WOOCOMMERCE|$woocommerce->version|"."CARRERA-".IYZICO_PLUGIN_VERSION;
         $affiliate = $this->checkoutSettings->findByKey('affiliate_network');
         if (strlen($affiliate) > 0) {
             $paymentSource = "$paymentSource|$affiliate";
@@ -196,13 +214,12 @@ class CheckoutForm extends WC_Payment_Gateway
         isset($checkoutData['shippingAddress']) ? $request->setShippingAddress($checkoutData['shippingAddress']) : null;
         $request->setBasketItems($checkoutData['basketItems']);
 
-
         // Create Options
         $options = $this->create_options();
 
         // Check Request Logs Settings
         $isSave = $this->checkoutSettings->findByKey('request_log_enabled');
-        $isSave === 'yes' ? $this->logger->info("CheckoutFormInitialize Request: " . $request->toJsonString()) : null;
+        $isSave === 'yes' ? $this->logger->info("CheckoutFormInitialize Request: ".$request->toJsonString()) : null;
 
         // Payment Initialize Request Response
         $response = CheckoutFormInitialize::create($request, $options);
@@ -228,7 +245,7 @@ class CheckoutForm extends WC_Payment_Gateway
         if (strlen($paymentPageUrl) === 0) {
             wc_add_notice(__(
                 "An unknown error occurred during the payment process. Please try again.",
-                "woocommerce-iyzico"
+                "iyzico-woocommerce"
             ), 'error');
             return [
                 'result' => 'failure'
@@ -287,14 +304,20 @@ class CheckoutForm extends WC_Payment_Gateway
             'fieldset' => [],
             'legend' => ['class' => []],
             'label' => ['for' => [], 'class' => []],
-            'input' => ['type' => [], 'name' => [], 'value' => [], 'class' => [], 'id' => [], 'placeholder' => [], 'style' => [], 'checked' => [], 'maxlength' => []],
+            'input' => [
+                'type' => [], 'name' => [], 'value' => [], 'class' => [], 'id' => [], 'placeholder' => [],
+                'style' => [], 'checked' => [], 'maxlength' => []
+            ],
             'select' => ['name' => [], 'class' => [], 'id' => [], 'style' => []],
             'option' => ['value' => [], 'selected' => []],
             'p' => ['class' => [], 'style' => []],
             'strong' => [],
             'span' => ['class' => [], 'aria-label' => [], 'tabindex' => []],
             'button' => ['name' => [], 'class' => [], 'type' => [], 'value' => [], 'disabled' => []],
-            'input' => ['type' => [], 'name' => [], 'value' => [], 'id' => [], 'class' => [], 'style' => [], 'checked' => [], 'maxlength' => []],
+            'input' => [
+                'type' => [], 'name' => [], 'value' => [], 'id' => [], 'class' => [], 'style' => [], 'checked' => [],
+                'maxlength' => []
+            ],
             'div' => ['class' => [], 'id' => [], 'style' => []],
             'img' => ['src' => [], 'style' => []],
             'link' => ['rel' => [], 'href' => [], 'type' => []],
@@ -310,7 +333,7 @@ class CheckoutForm extends WC_Payment_Gateway
     {
         wp_enqueue_style(
             'iyzico-loading-style',
-            plugin_dir_url(PLUGIN_BASEFILE) . 'assets/css/iyzico-loading.css',
+            plugin_dir_url(PLUGIN_BASEFILE).'assets/css/iyzico-loading.css',
             array(),
             IYZICO_PLUGIN_VERSION
         );

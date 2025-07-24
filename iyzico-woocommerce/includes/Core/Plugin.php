@@ -19,6 +19,20 @@ class Plugin
     public static function activate()
     {
         DatabaseManager::createTables();
+        
+        // Google Products XML cron'u başlat
+        if (!wp_next_scheduled('iyzico_generate_google_products_xml')) {
+            wp_schedule_event(time(), 'daily', 'iyzico_generate_google_products_xml');
+        }
+        
+        // XML dosyası kontrolü - eğer XML dosyası yoksa oluştur ve gönder
+        $upload_dir = wp_upload_dir();
+        $xml_file = $upload_dir['basedir'] . '/iyzico-google-products/google-products.xml';
+        
+        if (!file_exists($xml_file)) {
+            // XML oluşturma işlemini asenkron olarak planla (5 saniye sonra)
+            wp_schedule_single_event(time() + 5, 'iyzico_generate_google_products_xml_activation');
+        }
     }
 
     public static function deactivate()
@@ -35,10 +49,41 @@ class Plugin
         delete_option('iyzico_db_version');
 
         flush_rewrite_rules();
+        // Google Products XML cron'u temizle
+        wp_clear_scheduled_hook('iyzico_generate_google_products_xml');
+        wp_clear_scheduled_hook('iyzico_generate_google_products_xml_activation');
+        
+        // Google Products XML ile ilgili option'ları temizle
+        delete_option('iyzico_google_products_xml_url');
+        delete_option('iyzico_google_products_xml_last_update');
+        delete_option('iyzico_google_products_last_sent');
+        delete_option('iyzico_google_products_next_send_time');
+        delete_option('iyzico_google_products_retry_data');
     }
 
     public function run()
     {
+        // First load text domain
+        load_plugin_textdomain('iyzico-woocommerce', false, PLUGIN_LANG_PATH);
+
+        // Google Products XML cron event fonksiyonu
+        add_action('iyzico_generate_google_products_xml', function() {
+            $xmlGenerator = new \Iyzico\IyzipayWoocommerce\Common\Helpers\GoogleProductsXml();
+            $xmlGenerator->generateXml();
+        });
+        
+        // İlk kurulum için XML oluşturma event'i
+        add_action('iyzico_generate_google_products_xml_activation', function() {
+            try {
+                $xmlGenerator = new \Iyzico\IyzipayWoocommerce\Common\Helpers\GoogleProductsXml();
+                $xmlGenerator->generateXml();
+            } catch (Exception $e) {
+                $logger = new \Iyzico\IyzipayWoocommerce\Common\Helpers\Logger();
+                $logger->error('Iyzico Plugin Activation: XML generation failed - ' . $e->getMessage());
+            }
+        });
+
+        // Then load dependencies and register hooks
         $this->loadDependencies();
         $this->defineAdminHooks();
         $this->definePublicHooks();
@@ -52,29 +97,30 @@ class Plugin
 
     private function loadDependencies(): void
     {
-        require_once PLUGIN_PATH . '/includes/Common/Helpers/BlocksSupport.php';
-        require_once PLUGIN_PATH . '/includes/Common/Helpers/HighPerformanceOrderStorageSupport.php';
+        require_once PLUGIN_PATH.'/includes/Common/Helpers/BlocksSupport.php';
+        require_once PLUGIN_PATH.'/includes/Common/Helpers/HighPerformanceOrderStorageSupport.php';
+        require_once PLUGIN_PATH.'/includes/Common/Helpers/GoogleProductsXml.php';
 
-        require_once PLUGIN_PATH . '/includes/Admin/SettingsPage.php';
-        require_once PLUGIN_PATH . '/includes/Common/Hooks/AdminHooks.php';
+        require_once PLUGIN_PATH.'/includes/Admin/SettingsPage.php';
+        require_once PLUGIN_PATH.'/includes/Common/Hooks/AdminHooks.php';
 
-        require_once PLUGIN_PATH . '/includes/Checkout/CheckoutSettings.php';
-        require_once PLUGIN_PATH . '/includes/Common/Helpers/WebhookHelper.php';
+        require_once PLUGIN_PATH.'/includes/Checkout/CheckoutSettings.php';
+        require_once PLUGIN_PATH.'/includes/Common/Helpers/WebhookHelper.php';
 
-        require_once PLUGIN_PATH . '/includes/Common/Hooks/PublicHooks.php';
+        require_once PLUGIN_PATH.'/includes/Common/Hooks/PublicHooks.php';
 
-        require_once PLUGIN_PATH . '/includes/Checkout/CheckoutForm.php';
-        require_once PLUGIN_PATH . '/includes/Checkout/BlocksCheckoutMethod.php';
+        require_once PLUGIN_PATH.'/includes/Checkout/CheckoutForm.php';
+        require_once PLUGIN_PATH.'/includes/Checkout/BlocksCheckoutMethod.php';
 
-        require_once PLUGIN_PATH . '/includes/Pwi/Pwi.php';
-        require_once PLUGIN_PATH . '/includes/Pwi/BlocksPwiMethod.php';
+        require_once PLUGIN_PATH.'/includes/Pwi/Pwi.php';
+        require_once PLUGIN_PATH.'/includes/Pwi/BlocksPwiMethod.php';
     }
 
     private function defineAdminHooks()
     {
         if (is_admin()) {
             add_filter(
-                'plugin_action_links_' . plugin_basename(PLUGIN_BASEFILE),
+                'plugin_action_links_'.plugin_basename(PLUGIN_BASEFILE),
                 [$this, 'actionLinks']
             );
 
@@ -96,7 +142,7 @@ class Plugin
 
     private function generateWebhookKey()
     {
-        $uniqueUrlId = substr(base64_encode(time() . wp_rand()), 15, 6);
+        $uniqueUrlId = substr(base64_encode(time().wp_rand()), 15, 6);
         $iyziUrlId = get_option("iyzicoWebhookUrlKey");
         if (!$iyziUrlId) {
             add_option("iyzicoWebhookUrlKey", $uniqueUrlId, '', false);
@@ -124,15 +170,24 @@ class Plugin
     public function actionLinks($links): array
     {
         $custom_links = [];
-        $custom_links[] = '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico') . '">' . esc_html__(
-            'Settings',
-            'woocommerce-iyzico'
-        ) . '</a>';
-        $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">' . esc_html__('Docs', 'woocommerce-iyzico') . '</a>';
-        $custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">' . esc_html__(
-            'Support',
-            'woocommerce-iyzico'
-        ) . '</a>';
+
+        // Check if text domain is loaded, if not return links without translations
+        if (!is_textdomain_loaded('iyzico-woocommerce')) {
+            $custom_links[] = '<a href="'.admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico').'">Settings</a>';
+            $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">Docs</a>';
+            $custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">Support</a>';
+        } else {
+            $custom_links[] = '<a href="'.admin_url('admin.php?page=wc-settings&tab=checkout&section=iyzico').'">'.esc_html__(
+                    'Settings',
+                    'iyzico-woocommerce'
+                ).'</a>';
+            $custom_links[] = '<a target="_blank" href="https://docs.iyzico.com/">'.esc_html__('Docs',
+                    'iyzico-woocommerce').'</a>';
+            $custom_links[] = '<a target="_blank" href="https://iyzico.com/destek/iletisim">'.esc_html__(
+                    'Support',
+                    'iyzico-woocommerce'
+                ).'</a>';
+        }
 
         return array_merge($custom_links, $links);
     }

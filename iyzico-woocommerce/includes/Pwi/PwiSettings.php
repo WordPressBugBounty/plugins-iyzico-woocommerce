@@ -13,8 +13,8 @@ class PwiSettings extends Config
     {
         $this->form_fields = [
             'enabled' => [
-                'title' => __('Enable/Disable', 'woocommerce-iyzico'),
-                'label' => __('Enable Pay with iyzico', 'woocommerce-iyzico'),
+                'title' => __('Enable/Disable', 'iyzico-woocommerce'),
+                'label' => __('Enable Pay with iyzico', 'iyzico-woocommerce'),
                 'type' => 'checkbox',
                 'default' => 'no'
             ],

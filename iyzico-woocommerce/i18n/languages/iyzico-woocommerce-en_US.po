@@ -14,11 +14,12 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "X-Loco-Version: 2.6.3; wp-6.3-alpha-55617"
 
-msgid "Environment"
-msgstr "Environment"
+# This file is distributed under the GNU General Public License v2 or later.
+msgid "Api Type"
+msgstr "Api Type"
 
-msgid "API Key"
-msgstr "API Key"
+msgid "Api Key"
+msgstr "Api Key"
 
 msgid "Secret Key"
 msgstr "Secret Key"
@@ -26,14 +27,17 @@ msgstr "Secret Key"
 msgid "Payment Value"
 msgstr "Payment Value"
 
+msgid "Payment Value Message"
+msgstr "Payment Value Message"
+
 msgid "Payment Form Description Value"
 msgstr "Payment Form Description Value"
 
 msgid "Enable/Disable"
 msgstr "Enable/Disable"
 
-msgid "Enable iyzico Checkout Form"
-msgstr "Enable iyzico Checkout Form"
+msgid "Enable iyzico checkout"
+msgstr "Enable iyzico checkout"
 
 msgid "Payment Form Design"
 msgstr "Payment Form Design"
@@ -47,6 +51,12 @@ msgstr "Bottom Right"
 msgid "Hide"
 msgstr "Hide"
 
+msgid "Overlay Script"
+msgstr "Overlay Script"
+
+msgid "Installment"
+msgstr "Installment"
+
 msgid "Installment Commission"
 msgstr "Installment Commission"
 
@@ -56,10 +66,21 @@ msgstr "This message will show to the user during checkout."
 msgid "Pay with your credit card or debit card via iyzico."
 msgstr "Pay with your credit card or debit card via iyzico."
 
-msgid "Thank you for your order, please enter your card information in the payment form below to pay with iyzico checkout."
-msgstr "Thank you for your order, please enter your card information in the payment form below to pay with iyzico checkout."
+msgid ""
+"Thank you for your order, please click the button below to pay with iyzico "
+"checkout."
+msgstr ""
+"Thank you for your order, please click the button below to pay with iyzico "
+"checkout."
 
-msgid "Pay with Credit/Bank Card"
+msgid ""
+"Thank you for your order, please enter your card information in the payment "
+"form below to pay with iyzico checkout."
+msgstr ""
+"Thank you for your order, please enter your card information in the payment "
+"form below to pay with iyzico checkout. "
+
+msgid "Pay With Card"
 msgstr "Pay with Credit/Bank Card"
 
 msgid "Order Status"
@@ -67,6 +88,9 @@ msgstr "Order Status"
 
 msgid "Recommended, Default"
 msgstr "Recommended, Default"
+
+msgid "Siparişi onayla"
+msgstr "Pay with Credit/Bank Card"
 
 msgid "Default"
 msgstr "Default"
@@ -92,8 +116,24 @@ msgstr "Refunded"
 msgid "Failed"
 msgstr "Failed"
 
+msgid "iyzico Protected Shopping, Shipping Tracking"
+msgstr "iyzico Protected Shopping, Shipping Tracking"
+
+msgid ""
+"By entering the shipping tracking number of this order, you can ensure your "
+"customer have real time order tracking."
+msgstr ""
+"By entering the shipping tracking number of this order, you can ensure your "
+"customer have real time order tracking."
+
 msgid "Select"
 msgstr "Select"
+
+msgid "Shipping Company"
+msgstr "Shipping Company"
+
+msgid "Shipping Tracking Number"
+msgstr "Shipping Tracking Number"
 
 msgid "Pay with iyzico"
 msgstr "Pay with iyzico"
@@ -107,11 +147,33 @@ msgstr "Buyer Protection - Logo"
 msgid "Pay with Bank/Debit Card"
 msgstr "Pay with Bank/Debit Card"
 
+msgid "Banka/Kredi Kartı ile Öde"
+msgstr "Pay with Bank/Debit Card"
+
+msgid "Kredi kartı veya banka kartı ile güvenli ödeme yapabilirsiniz."
+msgstr "Pay with your credit card or debit card via iyzico."
+
 msgid "iyzico Checkout"
 msgstr "iyzico Checkout"
 
+msgid "Pay with iyzico-It’s Easy Now!"
+msgstr "Pay with iyzico-It’s Easy Now!"
+
+msgid ""
+"Webhook URL Error! Please, re-install the iyzico plugin after delete the "
+"iyzico plugin. Send an email to entegrasyon@iyzico.com"
+msgstr ""
+"Webhook URL Error! Please, re-install the iyzico plugin after delete the "
+"iyzico plugin. Send an email to entegrasyon@iyzico.com"
+
+msgid "Webhook Instructions"
+msgstr "Instructions and guide to"
+
 msgid "Support"
 msgstr "Support"
+
+msgid "Automatic"
+msgstr "Automatic"
 
 msgid "Turkish"
 msgstr "Turkish"
@@ -119,20 +181,69 @@ msgstr "Turkish"
 msgid "English"
 msgstr "English"
 
+msgid "3D security has not been validated for your card."
+msgstr "3D security has not been validated for your card."
+
 msgid "This controls the description which the user sees during checkout."
 msgstr "This controls the description which the user sees during checkout."
+
+msgid ""
+"Your application for Shopping Loan has been received. Your application will "
+"be finalized as soon as possible."
+msgstr ""
+"Your application for Shopping Loan has been received. Your application will "
+"be finalized as soon as possible."
+
+msgid "*Contact to activate webhook"
+msgstr "*Contact to activate webhook "
 
 msgid "Payment Checkout Value"
 msgstr "Payment Checkout Message "
 
+msgid "These payment method settings are made through the admin menu."
+msgstr "These payment method settings are made through the admin menu."
+
+msgid "Click to go to settings."
+msgstr "Click to go to settings."
+
 msgid "Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7."
 msgstr "Your money safe with iyzico! Store your iyzico card and enjoy one-click payment. All your transactions under the iyzico Buyer Protection guarantee. Get live support 24/7."
+
+msgid "Save Settings"
+msgstr "Save Settings"
+
+msgid "Permission denied."
+msgstr "Permission denied."
 
 msgid "Error"
 msgstr "Error"
 
+msgid "Checkout Form"
+msgstr "Checkout Form"
+
+msgid "Total Earnings (30 Days)"
+msgstr "Total Earnings (30 Days)"
+
+msgid "Growth from Last Month"
+msgstr "Growth from Last Month"
+
+msgid "Total Orders (30 Days)"
+msgstr "Total Orders (30 Days)"
+
+msgid "Last 30 Days Earnings"
+msgstr "Last 30 Days Earnings"
+
+msgid "Growth Compared to Last Month"
+msgstr "Growth Compared to Last Month"
+
+msgid "Number of Orders in the Last 30 Days"
+msgstr "Number of Orders in the Last 30 Days"
+
 msgid "This order will be processed on the iyzico payment page."
 msgstr "This order will be processed on the iyzico payment page."
+
+msgid "Token Not Found"
+msgstr "Token Not Found"
 
 msgid "Payment token is missing. Please try again or contact the store owner if the problem persists."
 msgstr "Payment token is missing. Please try again or contact the store owner if the problem persists."
@@ -167,35 +278,11 @@ msgstr "The BKM Express transaction was completed successfully."
 msgid "iyzico Bank transfer/EFT payment is pending."
 msgstr "iyzico Bank transfer/EFT payment is pending."
 
-msgid "Payment Form Language"
-msgstr "Payment Form Language"
+msgid "Enable Pay with iyzico"
+msgstr "Enable Pay with iyzico"
 
-msgid "This payment was confirmed via webhook."
-msgstr "This payment was confirmed via webhook."
+msgid "Cargo Campaign"
+msgstr "Cargo Campaign"
 
-msgid "You can customize the applicable installment options for each category. Important Note: On the payment page, if there are products from multiple different categories in the cart, the installment options will be determined based on the category offering the fewest installment options. Similarly, if a product belongs to more than one category, the installment options will be applied based on the category with the lowest number of installments."
-msgstr "You can customize the applicable installment options for each category. Important Note: On the payment page, if there are products from multiple different categories in the cart, the installment options will be determined based on the category offering the fewest installment options. Similarly, if a product belongs to more than one category, the installment options will be applied based on the category with the lowest number of installments."
-
-msgid "Category-Based Installment Settings"
-msgstr "Category-Based Installment Settings"
-
-msgid "Select Category"
-msgstr "Select Category"
-
-msgid "Installment Options"
-msgstr "Installment Options"
-
-msgid "Please mark the applicable installment options for the selected category."
-msgstr "Please mark the applicable installment options for the selected category."
-
-msgid "%d Installment"
-msgstr "%d Installment"
-
-msgid "Installment settings for all categories have been reset successfully."
-msgstr "Installment settings for all categories have been reset successfully."
-
-msgid "Reset All Category Installment Settings"
-msgstr "Reset All Category Installment Settings"
-
-msgid "Installment"
-msgstr "Installment"
+msgid "Enable Cargo Campaign"
+msgstr "Enable Cargo Campaign"

@@ -20,11 +20,11 @@ class DatabaseManager
     {
         self::ensureInitialized();
         try {
-            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            require_once(ABSPATH.'wp-admin/includes/upgrade.php');
 
             global $wpdb;
-            $table_name = $wpdb->prefix . 'iyzico_order';
-            $table_name2 = $wpdb->prefix . 'iyzico_card';
+            $table_name = $wpdb->prefix.'iyzico_order';
+            $table_name2 = $wpdb->prefix.'iyzico_card';
             $charset_collate = $wpdb->get_charset_collate();
 
             $sql = "CREATE TABLE $table_name (
@@ -50,7 +50,7 @@ class DatabaseManager
 
             self::$logger->info('Tables created successfully');
         } catch (Exception $e) {
-            self::$logger->error('Error creating tables: ' . $e->getMessage());
+            self::$logger->error('Error creating tables: '.$e->getMessage());
         }
     }
 
@@ -70,7 +70,7 @@ class DatabaseManager
         self::ensureInitialized();
         try {
             global $wpdb;
-            $table_name = $wpdb->prefix . 'iyzico_order';
+            $table_name = $wpdb->prefix.'iyzico_order';
 
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
             $table_exists = $wpdb->get_var(
@@ -114,7 +114,7 @@ class DatabaseManager
                 self::$logger->error('iyzico_order table does not exist');
             }
         } catch (Exception $e) {
-            self::$logger->error('Error updating tables: ' . $e->getMessage());
+            self::$logger->error('Error updating tables: '.$e->getMessage());
         }
     }
 
@@ -128,8 +128,8 @@ class DatabaseManager
             delete_option('iyzico_thank_you');
             delete_option('init_active_webhook_url');
 
-            $table_name = $wpdb->prefix . 'iyzico_order';
-            $table_name2 = $wpdb->prefix . 'iyzico_card';
+            $table_name = $wpdb->prefix.'iyzico_order';
+            $table_name2 = $wpdb->prefix.'iyzico_card';
 
             $sql = "DROP TABLE IF EXISTS $table_name;";
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
@@ -142,14 +142,21 @@ class DatabaseManager
 
             self::$logger->info('Tables dropped successfully');
         } catch (Exception $e) {
-            self::$logger->error('Error dropping tables: ' . $e->getMessage());
+            self::$logger->error('Error dropping tables: '.$e->getMessage());
         }
     }
 
-    public static function createOrder($paymentId, $orderId, $totalAmount, $status, $conversationId, $token, $paymentStatus)
-    {
+    public static function createOrder(
+        $paymentId,
+        $orderId,
+        $totalAmount,
+        $status,
+        $conversationId,
+        $token,
+        $paymentStatus
+    ) {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
         return self::$wpdb->insert(
@@ -167,11 +174,18 @@ class DatabaseManager
         );
     }
 
-    public static function createOrUpdateOrder($paymentId, $orderId, $conversationId, $token, $totalAmount, $status, $paymentStatus)
-    {
+    public static function createOrUpdateOrder(
+        $paymentId,
+        $orderId,
+        $conversationId,
+        $token,
+        $totalAmount,
+        $status,
+        $paymentStatus
+    ) {
         try {
             self::ensureInitialized();
-            $tableName = self::$wpdb->prefix . 'iyzico_order';
+            $tableName = self::$wpdb->prefix.'iyzico_order';
 
             $existingOrder = self::findOrderByOrderId($orderId);
             if (is_array($existingOrder)) {
@@ -209,7 +223,7 @@ class DatabaseManager
                 );
             }
         } catch (Exception $e) {
-            self::$logger->error('Error in createOrUpdateOrder: ' . $e->getMessage());
+            self::$logger->error('Error in createOrUpdateOrder: '.$e->getMessage());
             return false;
         }
     }
@@ -217,7 +231,7 @@ class DatabaseManager
     public static function findOrderByOrderId($orderId)
     {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $sql = self::$wpdb->prepare("
@@ -234,7 +248,7 @@ class DatabaseManager
     public static function updateStatusByOrderId($orderId, $status)
     {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         return self::$wpdb->update(
@@ -249,7 +263,7 @@ class DatabaseManager
     public static function updatePaymentStatusByOrderId($orderId, $paymentStatus)
     {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         return self::$wpdb->update(
@@ -264,7 +278,7 @@ class DatabaseManager
     public static function updatePaymentIdByOrderId($orderId, $paymentId)
     {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         return self::$wpdb->update(
@@ -279,7 +293,7 @@ class DatabaseManager
     public static function updateTotalAmountByOrderId($orderId, $totalAmount)
     {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         return self::$wpdb->update(
@@ -294,7 +308,7 @@ class DatabaseManager
     public static function findOrderByToken($token)
     {
         self::ensureInitialized();
-        $tableName = self::$wpdb->prefix . 'iyzico_order';
+        $tableName = self::$wpdb->prefix.'iyzico_order';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $sql = self::$wpdb->prepare("
@@ -310,7 +324,7 @@ class DatabaseManager
 
     public function findUserCardKey($customerId, $apiKey)
     {
-        $tableName = self::$wpdb->prefix . 'iyzico_card';
+        $tableName = self::$wpdb->prefix.'iyzico_card';
         $fieldName = 'card_user_key';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -329,7 +343,7 @@ class DatabaseManager
 
     public function saveUserCardKey($customerId, $cardUserKey, $apiKey)
     {
-        $tableName = self::$wpdb->prefix . 'iyzico_card';
+        $tableName = self::$wpdb->prefix.'iyzico_card';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         return self::$wpdb->insert(

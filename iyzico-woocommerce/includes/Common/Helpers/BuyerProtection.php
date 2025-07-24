@@ -30,7 +30,7 @@ class BuyerProtection
         if ($position === 'bottomLeft' || $position === 'bottomRight') {
             wp_add_inline_script(
                 'iyzico-overlay-script',
-                "window.iyz = { token: '" . esc_js($token) . "', position: '" . esc_js($position) . "', ideaSoft: false, pwi: true };",
+                "window.iyz = { token: '".esc_js($token)."', position: '".esc_js($position)."', ideaSoft: false, pwi: true };",
                 'before'
             );
 

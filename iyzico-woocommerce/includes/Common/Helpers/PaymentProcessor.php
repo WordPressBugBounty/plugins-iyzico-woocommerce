@@ -33,16 +33,36 @@ class PaymentProcessor
     {
         try {
             $iyziOrder = $this->getIyziOrder();
+            $changeIyzicoOrder = false;
 
             if (!is_array($iyziOrder)) {
-                throw new Exception(__("Order not found.", "woocommerce-iyzico"));
+                $iyziOrder['token'] = $_POST['token'];
+                $iyziOrder['conversation_id'] = '';
+                $changeIyzicoOrder = true;
             }
 
             $token = $iyziOrder['token'];
             $conversationId = $iyziOrder['conversation_id'];
-            $orderId = $iyziOrder['order_id'];
 
             $checkoutFormResult = $this->retrieveCheckoutForm($token, $conversationId);
+
+            if ($changeIyzicoOrder) {
+                $iyziOrder['order_id'] = $checkoutFormResult->getBasketId();
+
+                // Database Update
+                $this->databaseManager->createOrUpdateOrder(
+                    $checkoutFormResult->getPaymentId(),
+                    $checkoutFormResult->getBasketId(),
+                    $checkoutFormResult->getConversationId(),
+                    $checkoutFormResult->getToken(),
+                    $checkoutFormResult->getPaidPrice(),
+                    $checkoutFormResult->getStatus(),
+                    $checkoutFormResult->getPaymentStatus()
+                );
+
+            }
+
+            $orderId = $iyziOrder['order_id'];
             $order = $this->getOrder($orderId);
 
             $paymentStatus = $checkoutFormResult->getPaymentStatus();
@@ -86,7 +106,7 @@ class PaymentProcessor
         if (empty($token)) {
             throw new Exception(esc_html__(
                 "Payment token is missing. Please try again or contact the store owner if the problem persists.",
-                "woocommerce-iyzico"
+                "iyzico-woocommerce"
             ));
         }
 
@@ -119,7 +139,7 @@ class PaymentProcessor
         $order = wc_get_order($orderId);
 
         if (!$order) {
-            throw new Exception(esc_html__("Order not found.", "woocommerce-iyzico"));
+            throw new Exception(esc_html__("Order not found.", "iyzico-woocommerce"));
         }
 
         return $order;
@@ -163,7 +183,7 @@ class PaymentProcessor
             return;
         }
 
-        $message = "Payment ID: " . $checkoutFormResult->getPaymentId() . " Conversation ID: " . $checkoutFormResult->getConversationId();
+        $message = "Payment ID: ".$checkoutFormResult->getPaymentId()." Conversation ID: ".$checkoutFormResult->getConversationId();
         $order->add_order_note($message, 0, true);
 
         if ($this->checkoutSettings->findByKey('api_type') === "https://sandbox-api.iyzipay.com") {
@@ -202,10 +222,10 @@ class PaymentProcessor
 
             $installmentFee = $response->getPaidPrice() - $orderTotal;
             $itemFee = new WC_Order_Item_Fee();
-            $itemFee->set_name($response->getInstallment() . " " . __(
-                "Installment Commission",
-                'woocommerce-iyzico'
-            ));
+            $itemFee->set_name($response->getInstallment()." ".__(
+                    "Installment Commission",
+                    'iyzico-woocommerce'
+                ));
             $itemFee->set_amount($installmentFee);
             $itemFee->set_tax_class('');
             $itemFee->set_tax_status('none');
@@ -265,13 +285,13 @@ class PaymentProcessor
 
         if ($paymentStatus === "INIT_BANK_TRANSFER" && $status === "SUCCESS") {
             $order->update_status("on-hold");
-            $orderMessage = __('iyzico Bank transfer/EFT payment is pending.', 'woocommerce-iyzico');
+            $orderMessage = __('iyzico Bank transfer/EFT payment is pending.', 'iyzico-woocommerce');
             $order->add_order_note($orderMessage, 0, true);
         }
 
         if ($paymentStatus === "PENDING_CREDIT" && $status === "SUCCESS") {
             $order->update_status("on-hold");
-            $orderMessage = __('The shopping credit transaction has been initiated.', 'woocommerce-iyzico');
+            $orderMessage = __('The shopping credit transaction has been initiated.', 'iyzico-woocommerce');
             $order->add_order_note($orderMessage, 0, true);
         }
 
@@ -299,12 +319,12 @@ class PaymentProcessor
 
     private function handleException(Exception $e): void
     {
-        $this->logger->error('PaymentProcessor.php: ' . $e->getMessage());
+        $this->logger->error('PaymentProcessor.php: '.$e->getMessage());
         if (WC()->session !== null) {
             WC()->session->set('iyzico_error', $e->getMessage());
             wc_add_notice($e->getMessage(), 'error');
         }
-        wp_redirect(wc_get_checkout_url() . '?payment=failed');
+        wp_redirect(wc_get_checkout_url().'?payment=failed');
         exit;
     }
 
@@ -327,9 +347,14 @@ class PaymentProcessor
             $order = $this->getOrder($orderId);
 
             if ($iyziEventType === 'CHECKOUT_FORM_AUTH' && $paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-                $orderMessage = __("This payment was confirmed via webhook.", "woocommerce-iyzico");
+                $orderMessage = __("This payment was confirmed via webhook.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
@@ -337,7 +362,7 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'CREDIT_PAYMENT_INIT' && $paymentStatus === 'INIT_CREDIT' && $status === 'SUCCESS') {
-                $orderMessage = __("The shopping credit transaction has been initiated.", "woocommerce-iyzico");
+                $orderMessage = __("The shopping credit transaction has been initiated.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
                 $order->update_status("on-hold");
                 $order->save();
@@ -346,7 +371,7 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'CREDIT_PAYMENT_PENDING' && $paymentStatus === 'PENDING_CREDIT' && $status === 'SUCCESS') {
-                $orderMessage = __("Currently in the process of applying for a shopping loan.", "woocommerce-iyzico");
+                $orderMessage = __("Currently in the process of applying for a shopping loan.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
                 $order->update_status("on-hold");
                 $order->save();
@@ -355,19 +380,38 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'CREDIT_PAYMENT_AUTH' && $paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-                $orderMessage = __("The shopping loan transaction was completed successfully.", "woocommerce-iyzico");
+                $orderMessage = __("The shopping loan transaction was completed successfully.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
             }
 
-            if ($iyziEventType === 'BANK_TRANSFER_AUTH' && $paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-                $orderMessage = __("The bank transfer transaction was completed successfully.", "woocommerce-iyzico");
+            if ($iyziEventType === 'CREDIT_PAYMENT_AUTH' && $paymentStatus === 'FAILURE') {
+                $orderMessage = __("The shopping loan transaction failed.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $order->update_status("failed");
+                $order->save();
+
+                return http_response_code(200);
+            }
+
+            if ($iyziEventType === 'BANK_TRANSFER_AUTH' && $paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
+                $orderMessage = __("The bank transfer transaction was completed successfully.", "iyzico-woocommerce");
+                $order->add_order_note($orderMessage, 0, true);
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
@@ -375,9 +419,14 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'BALANCE' && $paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-                $orderMessage = __("This payment was confirmed via webhook.", "woocommerce-iyzico");
+                $orderMessage = __("This payment was confirmed via webhook.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
@@ -385,9 +434,14 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'BKM_AUTH' && $paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-                $orderMessage = __("The BKM Express transaction was completed successfully.", "woocommerce-iyzico");
+                $orderMessage = __("The BKM Express transaction was completed successfully.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
@@ -408,9 +462,14 @@ class PaymentProcessor
             $status = strtoupper($response['status']);
 
             if ($iyziEventType === 'CHECKOUT_FORM_AUTH' && $status === 'SUCCESS') {
-                $orderMessage = __("This payment was confirmed via webhook.", "woocommerce-iyzico");
+                $orderMessage = __("This payment was confirmed via webhook.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
@@ -418,7 +477,7 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'CREDIT_PAYMENT_INIT' && $status == 'INIT_CREDIT') {
-                $orderMessage = __("The shopping credit transaction has been initiated.", "woocommerce-iyzico");
+                $orderMessage = __("The shopping credit transaction has been initiated.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
                 $order->update_status("on-hold");
                 $order->save();
@@ -427,7 +486,7 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'CREDIT_PAYMENT_PENDING' && $status === 'PENDING_CREDIT') {
-                $orderMessage = __("Currently in the process of applying for a shopping loan.", "woocommerce-iyzico");
+                $orderMessage = __("Currently in the process of applying for a shopping loan.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
                 $order->update_status("on-hold");
                 $order->save();
@@ -436,19 +495,38 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'CREDIT_PAYMENT_AUTH' && $status === 'SUCCESS') {
-                $orderMessage = __("The shopping loan transaction was completed successfully.", "woocommerce-iyzico");
+                $orderMessage = __("The shopping loan transaction was completed successfully.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
             }
 
-            if ($iyziEventType === 'BANK_TRANSFER_AUTH' && $status == 'SUCCESS') {
-                $orderMessage = __("The bank transfer transaction was completed successfully.", "woocommerce-iyzico");
+            if ($iyziEventType === 'CREDIT_PAYMENT_AUTH' && $status === 'FAILURE') {
+                $orderMessage = __("The shopping loan transaction failed.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $order->update_status("failed");
+                $order->save();
+
+                return http_response_code(200);
+            }
+
+            if ($iyziEventType === 'BANK_TRANSFER_AUTH' && $status == 'SUCCESS') {
+                $orderMessage = __("The bank transfer transaction was completed successfully.", "iyzico-woocommerce");
+                $order->add_order_note($orderMessage, 0, true);
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->payment_complete();
                 $order->save();
 
@@ -458,7 +536,7 @@ class PaymentProcessor
             if ($iyziEventType === 'BALANCE' && $status === 'SUCCESS') {
                 $orderMessage = __(
                     "The balance payment transaction was completed successfully.",
-                    "woocommerce-iyzico"
+                    "iyzico-woocommerce"
                 );
                 $order->add_order_note($orderMessage, 0, true);
                 $order->update_status("processing");
@@ -469,9 +547,14 @@ class PaymentProcessor
             }
 
             if ($iyziEventType === 'BKM_AUTH' && $status === 'SUCCESS') {
-                $orderMessage = __("The BKM Express transaction was completed successfully.", "woocommerce-iyzico");
+                $orderMessage = __("The BKM Express transaction was completed successfully.", "iyzico-woocommerce");
                 $order->add_order_note($orderMessage, 0, true);
-                $order->update_status("processing");
+                $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+                if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                    $order->update_status($settingsOrderStatus);
+                } else {
+                    $order->update_status("processing");
+                }
                 $order->save();
 
                 return http_response_code(200);
