@@ -33,9 +33,6 @@ class GoogleProductsXml
         
         if ($api_type === 'https://sandbox-api.iyzipay.com') {
             $this->remotePostUrl = '';
-            $this->logger->info('Iyzico Google XML: Sandbox environment detected, remote sending disabled');
-        } else {
-            $this->logger->info('Iyzico Google XML: Live environment detected, remote sending enabled');
         }
     }
 
@@ -45,11 +42,8 @@ class GoogleProductsXml
      * @return string XML content
      */
     public function generateXml()
-    {
-        $this->logger->info('Iyzico Google XML: Starting XML generation process');
-        
+    {   
         $this->products = $this->getWooCommerceProducts();
-        $this->logger->info('Iyzico Google XML: Found ' . count($this->products) . ' products to process');
         
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">' . "\n";
@@ -74,20 +68,8 @@ class GoogleProductsXml
         
         $next_send_time = get_option('iyzico_google_products_next_send_time', 0);
         
-        // Eğer next_send_time 0 ise (hiç ayarlanmamışsa), ilk gönderim için hazırla
-        if ($next_send_time == 0) {
-            $this->logger->info('Iyzico Google XML: Next send time not set, preparing for first send');
-        } else {
-            $this->logger->info('Iyzico Google XML: Next send time: ' . date('d.m.Y - H:i:s', (int)$next_send_time) . ' (Current time: ' . date('d.m.Y - H:i:s') . ')');
-        }
-        
         if (!empty($this->remotePostUrl) && ($next_send_time == 0 || time() >= (int)$next_send_time)) {
-            $this->logger->info('Iyzico Google XML: Attempting to send XML to remote server');
             $this->sendToRemoteServer();
-        } else if ($next_send_time > 0 && time() < (int)$next_send_time) {
-            $this->logger->info('Iyzico Google XML: Remote server send is delayed until ' . date('d.m.Y - H:i:s', (int)$next_send_time));
-        } else if (empty($this->remotePostUrl)) {
-            $this->logger->warning('Iyzico Google XML: Remote post URL is empty, skipping send');
         }
         
         return $xml;
@@ -102,7 +84,6 @@ class GoogleProductsXml
     private function generateProductXml($product)
     {
         if (!$product || !is_object($product)) {
-            $this->logger->error('Iyzico Google XML: Product is null or not an object.');
             return '';
         }
         
@@ -444,8 +425,6 @@ class GoogleProductsXml
      */
     private function sendToRemoteServer()
     {
-        $this->logger->info('Iyzico Google XML: Starting remote server send process');
-        
         if (empty($this->remotePostUrl)) {
             $this->logger->error('Iyzico Google XML: Remote post URL is empty, cannot send');
             return;
@@ -456,32 +435,22 @@ class GoogleProductsXml
             $this->logger->error('Iyzico Google XML: XML URL is empty, cannot send');
             return;
         }
-        
-        $this->logger->info('Iyzico Google XML: Remote URL: ' . $this->remotePostUrl);
-        $this->logger->info('Iyzico Google XML: XML URL: ' . $xml_url);
-
-        // --- YENİ: Retry ve zaman kontrolü ---
+    
         $retry_data = get_option('iyzico_google_products_retry_data', array());
         $retry_count = isset($retry_data['count']) ? (int)$retry_data['count'] : 0;
         $last_try_time = isset($retry_data['last_try']) ? (int)$retry_data['last_try'] : 0;
         $max_retries = 3;
         $retry_interval = 15 * 60; // 15 dakika
 
-        // İlk kurulum kontrolü - eğer hiç gönderim yapılmamışsa retry kontrollerini atla
         $last_sent = get_option('iyzico_google_products_last_sent', null);
         $is_first_setup = empty($last_sent);
         
-        $this->logger->info('Iyzico Google XML: Retry count: ' . $retry_count . ', Max retries: ' . $max_retries);
-        $this->logger->info('Iyzico Google XML: Is first setup: ' . ($is_first_setup ? 'Yes' : 'No'));
-
-        // Eğer 3 deneme yapıldıysa ve hala başarılı değilse, tekrar deneme yapma (ilk kurulum değilse)
         if (!$is_first_setup && $retry_count >= $max_retries && (time() - $last_try_time) < $retry_interval) {
             $this->logger->error('Iyzico Google XML: Max retry reached, will not try again until next XML generation.');
             return;
         }
-        // Eğer son denemeden sonra 15 dakika geçmediyse tekrar deneme (ilk kurulum değilse)
+
         if (!$is_first_setup && $retry_count > 0 && (time() - $last_try_time) < $retry_interval) {
-            $this->logger->info('Iyzico Google XML: Waiting for retry interval. Next try at ' . date('d.m.Y - H:i:s', $last_try_time + $retry_interval));
             return;
         }
 
@@ -505,7 +474,6 @@ class GoogleProductsXml
             'previous_update' => $previous_update,
             'xml_last_update' => $xml_last_update
         );
-        $this->logger->info('Iyzico Google XML: Sending data to remote server: ' . json_encode($data));
         
         $args = array(
             'body' => json_encode($data),
@@ -515,44 +483,32 @@ class GoogleProductsXml
             )
         );
         
-        $this->logger->info('Iyzico Google XML: Making HTTP request to: ' . $this->remotePostUrl);
         $response = wp_remote_post($this->remotePostUrl, $args);
         
         if (!is_wp_error($response)) {
             $code = wp_remote_retrieve_response_code($response);
             $body = wp_remote_retrieve_body($response);
-            $this->logger->info('Iyzico Google XML: HTTP response code: ' . $code);
-            $this->logger->info('Iyzico Google XML: HTTP response body: ' . $body);
             
             if ($code !== 200) {
-                $this->logger->error('Iyzico Google XML: Remote server returned HTTP ' . $code . ' - Body: ' . $body);
-                // Başarısız ise retry sayaçlarını güncelle
                 $retry_count++;
                 update_option('iyzico_google_products_retry_data', array(
                     'count' => $retry_count,
                     'last_try' => time()
                 ));
-                $this->logger->info('Iyzico Google XML: Updated retry count to: ' . $retry_count);
             } else {
-                $this->logger->info('Iyzico Google XML: Remote server request successful');
                 update_option('iyzico_google_products_last_sent', current_time('timestamp'));
-                // Başarılı ise retry sayaçlarını sıfırla
                 delete_option('iyzico_google_products_retry_data');
-                // --- YENİ: Sonraki gönderim için 7-12 gün arası random bekleme ayarla ---
-                $days = 7 + rand(0, 5); // 7-12 gün
+                $days = 7 + rand(0, 5);
                 $next_send_time = time() + ($days * 24 * 60 * 60);
                 update_option('iyzico_google_products_next_send_time', $next_send_time);
-                $this->logger->info('Iyzico Google XML: Next send scheduled for ' . $days . ' days from now (' . date('d.m.Y - H:i:s', $next_send_time) . ')');
             }
         } else {
             $this->logger->error('Iyzico Google XML: wp_remote_post error: ' . $response->get_error_message());
-            // Hata ise retry sayaçlarını güncelle
             $retry_count++;
             update_option('iyzico_google_products_retry_data', array(
                 'count' => $retry_count,
                 'last_try' => time()
             ));
-            $this->logger->info('Iyzico Google XML: Updated retry count to: ' . $retry_count);
         }
     }
 

@@ -58,7 +58,7 @@ abstract class AbstractLogger implements LoggerInterface
         $htaccessContent = "Deny from all\n";
         $filePath = trailingslashit($this->logDir).'.htaccess';
 
-        $wp_filesystem->put_contents($filePath, $htaccessContent, FS_CHMOD_FILE);
+        $wp_filesystem->put_contents($filePath, $htaccessContent, \FS_CHMOD_FILE);
     }
 
     abstract public function info(string $message);

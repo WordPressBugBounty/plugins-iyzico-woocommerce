@@ -100,6 +100,7 @@ class Plugin
         require_once PLUGIN_PATH.'/includes/Common/Helpers/BlocksSupport.php';
         require_once PLUGIN_PATH.'/includes/Common/Helpers/HighPerformanceOrderStorageSupport.php';
         require_once PLUGIN_PATH.'/includes/Common/Helpers/GoogleProductsXml.php';
+        require_once PLUGIN_PATH.'/includes/Common/Helpers/PluginUpdateHandler.php';
 
         require_once PLUGIN_PATH.'/includes/Admin/SettingsPage.php';
         require_once PLUGIN_PATH.'/includes/Common/Hooks/AdminHooks.php';
