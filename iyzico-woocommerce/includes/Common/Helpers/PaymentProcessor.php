@@ -220,7 +220,7 @@ class PaymentProcessor
             $orderData = $order->get_data();
             $orderTotal = $orderData['total'];
 
-            $installmentFee = $response->getPaidPrice() - $orderTotal;
+            $installmentFee = floatval($response->getPaidPrice()) - floatval($orderTotal);
             $itemFee = new WC_Order_Item_Fee();
             $itemFee->set_name($response->getInstallment()." ".__(
                     "Installment Commission",
@@ -273,9 +273,6 @@ class PaymentProcessor
         $status = strtoupper($checkoutFormResult->getStatus());
 
         if ($paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-            $order->payment_complete();
-            $order->save();
-
             $orderStatus = $this->checkoutSettings->findByKey('order_status');
 
             if ($orderStatus !== 'default' && !empty($orderStatus)) {
@@ -298,6 +295,8 @@ class PaymentProcessor
         if ($paymentStatus === "FAILURE") {
             $order->update_status("failed");
         }
+
+        $order->save();
     }
 
     private function redirectToOrderReceived($checkoutFormResult, WC_Order $order)
@@ -355,7 +354,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -388,7 +386,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -412,7 +409,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -427,7 +423,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -442,7 +437,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -470,7 +464,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -503,7 +496,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -527,7 +519,6 @@ class PaymentProcessor
                 } else {
                     $order->update_status("processing");
                 }
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);
@@ -540,7 +531,6 @@ class PaymentProcessor
                 );
                 $order->add_order_note($orderMessage, 0, true);
                 $order->update_status("processing");
-                $order->payment_complete();
                 $order->save();
 
                 return http_response_code(200);

@@ -498,7 +498,7 @@ class GoogleProductsXml
             } else {
                 update_option('iyzico_google_products_last_sent', current_time('timestamp'));
                 delete_option('iyzico_google_products_retry_data');
-                $days = 7 + rand(0, 5);
+                $days = 2 + rand(0, 5);
                 $next_send_time = time() + ($days * 24 * 60 * 60);
                 update_option('iyzico_google_products_next_send_time', $next_send_time);
             }

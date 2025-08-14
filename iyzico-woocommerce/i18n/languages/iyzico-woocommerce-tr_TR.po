@@ -58,7 +58,7 @@ msgid "Installment"
 msgstr "Taksit"
 
 msgid "Installment Commission"
-msgstr "Taksit Vade Komisyonu"
+msgstr "Taksit Komisyonu"
 
 msgid "This message will show to the user during checkout."
 msgstr "Bu mesaj ödeme sırasında kullanıcıya gösterecektir."

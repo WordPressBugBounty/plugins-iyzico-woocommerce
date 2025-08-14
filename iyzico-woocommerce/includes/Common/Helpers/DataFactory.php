@@ -196,14 +196,16 @@ class DataFactory
 
     protected function oneProductCalc($order)
     {
-        $keyNumber = 0;
-        $basketItems[$keyNumber] = new stdClass();
-
-        $basketItems[$keyNumber]->id = $order->get_id();
-        $basketItems[$keyNumber]->price = $this->priceHelper->priceParser(round($order->get_total(), 2));
-        $basketItems[$keyNumber]->name = 'Woocommerce - Custom Order Page';
-        $basketItems[$keyNumber]->category1 = 'Custom Order Page';
-        $basketItems[$keyNumber]->itemType = 'PHYSICAL';
+        $basketItems = [];
+        
+        $basketItem = new BasketItem();
+        $basketItem->setId($this->validateStringVal($order->get_id()));
+        $basketItem->setPrice($this->priceHelper->priceParser(round($order->get_total(), 2)));
+        $basketItem->setName($this->validateStringVal('Woocommerce - Custom Order Page'));
+        $basketItem->setCategory1($this->validateStringVal('Custom Order Page'));
+        $basketItem->setItemType(BasketItemType::PHYSICAL);
+        
+        $basketItems[] = $basketItem;
 
         return $basketItems;
     }
