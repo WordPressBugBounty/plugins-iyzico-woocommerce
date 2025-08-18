@@ -1,12 +1,14 @@
 === iyzico for WooCommerce ===
 Contributors: iyzico,mehmetselim,sozgat,feyzullahdemir,tarikkamat
 Tags: payment, ecommerce, credit card, checkout woocommerce, iyzico
-Tested up to: 6.7.2
-Stable tag: 3.5.24
+Tested up to: 6.8
+Stable tag: 3.5.25
 Requires at least: 6.6.2
 Requires PHP: 7.4.33
 License: LGPL v3.0
 License URI: https://www.gnu.org/licenses/lgpl-3.0.en.html
+
+iyzico latest payment processing solution. Accept credit/debit cards, alternative digital wallets and bank accounts.
 
 == Description ==
 - This is a WooCommerce module developed by iyzico Integration team.
@@ -57,6 +59,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 7. Order Management
 
 == Changelog ==
+
+= 3.5.25 =
+  * Fix : Bug fix
 
 = 3.5.24 =
   * Fix : Bug fix
@@ -267,6 +272,9 @@ Wordpress Marketplace in search "iyzico WooCommerce" and install
 == Upgrade Notice ==
 
 == Changelog ==
+
+= 3.5.25 =
+  * Fix : Bug fix
 
 = 3.5.24 =
   * Fix : Bug fix

@@ -59,7 +59,6 @@ class PaymentProcessor
                     $checkoutFormResult->getStatus(),
                     $checkoutFormResult->getPaymentStatus()
                 );
-
             }
 
             $orderId = $iyziOrder['order_id'];
@@ -183,7 +182,7 @@ class PaymentProcessor
             return;
         }
 
-        $message = "Payment ID: ".$checkoutFormResult->getPaymentId()." Conversation ID: ".$checkoutFormResult->getConversationId();
+        $message = "Payment ID: " . $checkoutFormResult->getPaymentId() . " Conversation ID: " . $checkoutFormResult->getConversationId();
         $order->add_order_note($message, 0, true);
 
         if ($this->checkoutSettings->findByKey('api_type') === "https://sandbox-api.iyzipay.com") {
@@ -222,10 +221,10 @@ class PaymentProcessor
 
             $installmentFee = floatval($response->getPaidPrice()) - floatval($orderTotal);
             $itemFee = new WC_Order_Item_Fee();
-            $itemFee->set_name($response->getInstallment()." ".__(
-                    "Installment Commission",
-                    'iyzico-woocommerce'
-                ));
+            $itemFee->set_name($response->getInstallment() . " " . __(
+                "Installment Commission",
+                'iyzico-woocommerce'
+            ));
             $itemFee->set_amount($installmentFee);
             $itemFee->set_tax_class('');
             $itemFee->set_tax_status('none');
@@ -273,10 +272,11 @@ class PaymentProcessor
         $status = strtoupper($checkoutFormResult->getStatus());
 
         if ($paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
-            $orderStatus = $this->checkoutSettings->findByKey('order_status');
-
-            if ($orderStatus !== 'default' && !empty($orderStatus)) {
-                $order->update_status($orderStatus);
+            $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+            if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                $order->update_status($settingsOrderStatus);
+            } else {
+                $order->update_status("processing");
             }
         }
 
@@ -318,12 +318,12 @@ class PaymentProcessor
 
     private function handleException(Exception $e): void
     {
-        $this->logger->error('PaymentProcessor.php: '.$e->getMessage());
+        $this->logger->error('PaymentProcessor.php: ' . $e->getMessage());
         if (WC()->session !== null) {
             WC()->session->set('iyzico_error', $e->getMessage());
             wc_add_notice($e->getMessage(), 'error');
         }
-        wp_redirect(wc_get_checkout_url().'?payment=failed');
+        wp_redirect(wc_get_checkout_url() . '?payment=failed');
         exit;
     }
 
