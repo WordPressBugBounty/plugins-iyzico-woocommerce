@@ -77,7 +77,7 @@ class Plugin
             try {
                 $xmlGenerator = new \Iyzico\IyzipayWoocommerce\Common\Helpers\GoogleProductsXml();
                 $xmlGenerator->generateXml();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $logger = new \Iyzico\IyzipayWoocommerce\Common\Helpers\Logger();
                 $logger->error('Iyzico Plugin Activation: XML generation failed - ' . $e->getMessage());
             }

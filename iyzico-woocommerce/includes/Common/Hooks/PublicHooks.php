@@ -33,10 +33,16 @@ class PublicHooks
 
         add_action('wp_footer', function () {
             $this->getBuyerProtection()->iyzicoOverlayScriptMobileCss();
+            $this->getBuyerProtection()->add_buyer_protection_divs();
         });
 
         add_action('wp_enqueue_scripts', function () {
             $this->getBuyerProtection()->enqueue_iyzico_overlay_script();
+        });
+
+        // Add buyer protection div for product detail pages
+        add_action('woocommerce_after_add_to_cart_button', function () {
+            $this->getBuyerProtection()->add_product_detail_div();
         });
     }
 

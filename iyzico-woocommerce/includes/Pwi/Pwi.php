@@ -159,7 +159,7 @@ class Pwi extends WC_Payment_Gateway
         // Prepare Checkout Data
         $request->setBuyer($checkoutData['buyer']);
         $request->setBillingAddress($checkoutData['billingAddress']);
-        $request->setShippingAddress($checkoutData['shippingAddress']);
+        isset($checkoutData['shippingAddress']) ? $request->setShippingAddress($checkoutData['shippingAddress']) : null;
         $request->setBasketItems($checkoutData['basketItems']);
 
         // Create Options
