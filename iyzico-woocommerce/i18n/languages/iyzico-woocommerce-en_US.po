@@ -42,11 +42,17 @@ msgstr "Enable iyzico checkout"
 msgid "Payment Form Design"
 msgstr "Payment Form Design"
 
-msgid "Left"
-msgstr "Bottom Left"
+msgid "Bottom Left + Product Detail"
+msgstr "Bottom Left + Product Detail"
 
-msgid "Right"
-msgstr "Bottom Right"
+msgid "Bottom Right + Product Detail"
+msgstr "Bottom Right + Product Detail"
+
+msgid "Only Overlay Script"
+msgstr "Only Overlay Script"
+
+msgid "Only Product Detail Script"
+msgstr "Only Product Detail Script"
 
 msgid "Hide"
 msgstr "Hide"
@@ -286,3 +292,15 @@ msgstr "Cargo Campaign"
 
 msgid "Enable Cargo Campaign"
 msgstr "Enable Cargo Campaign"
+
+msgid "Order initialized via iyzico Checkout."
+msgstr "Order initialized via iyzico Checkout."
+
+msgid "Customer was redirected to iyzico hosted payment page (redirect flow)."
+msgstr "Customer was redirected to iyzico hosted payment page (redirect flow)."
+
+msgid "iyzico Checkout iframe fully loaded in customer browser (iyziInit detected)."
+msgstr "iyzico Checkout iframe fully loaded in customer browser (iyziInit detected)."
+
+msgid "Order status will be changed from %1$s to %2$s by iyzico payment result."
+msgstr "Order status will be changed from %1$s to %2$s by iyzico payment result."

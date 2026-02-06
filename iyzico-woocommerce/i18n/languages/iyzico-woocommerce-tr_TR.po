@@ -42,11 +42,17 @@ msgstr "iyzico ödeme formunu etkinleştir"
 msgid "Payment Form Design"
 msgstr "Ödeme Formu Görünümü"
 
-msgid "Left"
-msgstr "Alt Sol"
+msgid "Bottom Left + Product Detail"
+msgstr "Alt Sol + Ürün Detay"
 
-msgid "Right"
-msgstr "Alt Sağ"
+msgid "Bottom Right + Product Detail"
+msgstr "Alt Sağ + Ürün Detay"
+
+msgid "Only Overlay Script"
+msgstr "Sadece Korumalı Alışveriş Göster"
+
+msgid "Only Product Detail Script"
+msgstr "Sadece Ürün Detay Göster"
 
 msgid "Hide"
 msgstr "Gizli"
@@ -298,3 +304,15 @@ msgstr "Kargo Kampanyası"
 
 msgid "Enable Cargo Campaign"
 msgstr "Kargo Kampanyası Aktifleştir"
+
+msgid "Order initialized via iyzico Checkout."
+msgstr "Sipariş iyzico Checkout üzerinden başlatıldı."
+
+msgid "Customer was redirected to iyzico hosted payment page (redirect flow)."
+msgstr "Müşteri iyzico barındırılan ödeme sayfasına yönlendirildi (redirect akışı)."
+
+msgid "iyzico Checkout iframe fully loaded in customer browser (iyziInit detected)."
+msgstr "iyzico Checkout iframe’i müşterinin tarayıcısında tamamen yüklendi (iyziInit algılandı)."
+
+msgid "Order status will be changed from %1$s to %2$s by iyzico payment result."
+msgstr "Sipariş durumu iyzico ödeme sonucu ile %1$s durumundan %2$s durumuna değiştirilecek."

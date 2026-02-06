@@ -27,10 +27,19 @@ class BuyerProtection
         $token = get_option('iyzico_overlay_token');
         $position = $checkoutSettings->findByKey('overlay_script');
 
-        if ($position === 'bottomLeft' || $position === 'bottomRight') {
+        // Script should load for all configurations except when completely hidden
+        if (in_array($position, ['bottomLeft', 'bottomRight', 'onlyOverlayScript', 'onlyProductDetailScript'], true)) {
+            // Map config values to script position (left/right)
+            $scriptPosition = $position;
+            if (in_array($position, ['bottomLeft', 'onlyOverlayScript'], true)) {
+                $scriptPosition = 'left';
+            } elseif ($position === 'bottomRight') {
+                $scriptPosition = 'right';
+            }
+
             wp_add_inline_script(
                 'iyzico-overlay-script',
-                "window.iyz = { token: '" . esc_js($token) . "', position: '" . esc_js($position) . "', ideaSoft: false, pwi: true };",
+                "window.iyz = { token: '" . esc_js($token) . "', position: '" . esc_js($scriptPosition) . "', ideaSoft: false, pwi: true };",
                 'before'
             );
 
@@ -51,6 +60,13 @@ class BuyerProtection
     {
         $checkoutSettings = new CheckoutSettings();
         $position = $checkoutSettings->findByKey('overlay_script');
+        $hasOverlay = in_array($position, ['bottomLeft', 'bottomRight', 'onlyOverlayScript'], true);
+        $logoUrl = null;
+
+        // If overlay is disabled completely, do nothing
+        if (!$hasOverlay) {
+            return;
+        }
 
         if (has_custom_logo()) {
             $custom_logo_id = get_theme_mod('custom_logo');
@@ -92,7 +108,8 @@ class BuyerProtection
         $checkoutSettings = new CheckoutSettings();
         $position = $checkoutSettings->findByKey('overlay_script');
 
-        if ($position === 'bottomLeft' || $position === 'bottomRight') {
+        // Show product detail widget when configured on either side or alone
+        if (in_array($position, ['bottomLeft', 'bottomRight', 'onlyProductDetailScript'], true)) {
             echo '<div id="iyzico-bpo2" style="margin-top: 10px;" data-widget data-type="product-detail"></div>';
         }
     }

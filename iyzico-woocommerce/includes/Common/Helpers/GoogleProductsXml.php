@@ -15,7 +15,9 @@ class GoogleProductsXml
 
     public function __construct()
     {
-        $this->siteUrl = get_site_url();
+        // PHP 8.1+ compatibility: ensure get_site_url() returns string
+        $site_url = get_site_url();
+        $this->siteUrl = $site_url !== null && $site_url !== false ? (string) $site_url : '';
         $this->remotePostUrl = 'https://xml.iyzitest.com/save';
         $this->logger = new \Iyzico\IyzipayWoocommerce\Common\Helpers\Logger();
         $this->checkoutSettings = new CheckoutSettings();
@@ -48,9 +50,16 @@ class GoogleProductsXml
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">' . "\n";
         $xml .= '    <channel>' . "\n";
-        $xml .= '        <title>' . esc_html(get_bloginfo('name')) . ' - Google Products</title>' . "\n";
-        $xml .= '        <link>' . esc_url($this->siteUrl) . '</link>' . "\n";
-        $xml .= '        <description>Google Products XML Feed for ' . esc_html(get_bloginfo('name')) . '</description>' . "\n";
+        
+        // PHP 8.1+ compatibility: ensure get_bloginfo returns string
+        $blog_name = get_bloginfo('name');
+        $blog_name = $blog_name !== false && $blog_name !== null ? (string) $blog_name : '';
+        $xml .= '        <title>' . esc_html($blog_name) . ' - Google Products</title>' . "\n";
+        
+        // PHP 8.1+ compatibility: ensure siteUrl is string
+        $site_url = $this->siteUrl !== null ? (string) $this->siteUrl : '';
+        $xml .= '        <link>' . esc_url($site_url) . '</link>' . "\n";
+        $xml .= '        <description>Google Products XML Feed for ' . esc_html($blog_name) . '</description>' . "\n";
         $xml .= '        <lastBuildDate>' . date('r') . '</lastBuildDate>' . "\n";
         
         foreach ($this->products as $product) {
@@ -88,36 +97,64 @@ class GoogleProductsXml
         }
         
         $xml = '        <item>' . "\n";
-        $xml .= '            <g:id>' . esc_html($product->get_id()) . '</g:id>' . "\n";
-        $xml .= '            <g:title>' . $this->cleanXmlContent($product->get_name()) . '</g:title>' . "\n";
-        $xml .= '            <g:description>' . $this->cleanXmlContent(wp_strip_all_tags($product->get_description())) . '</g:description>' . "\n";
-        $xml .= '            <g:link>' . esc_url($product->get_permalink()) . '</g:link>' . "\n";
+        
+        // PHP 8.1+ compatibility: ensure get_id() returns string
+        $product_id = $product->get_id();
+        $product_id = $product_id !== null ? (string) $product_id : '';
+        $xml .= '            <g:id>' . esc_html($product_id) . '</g:id>' . "\n";
+        
+        // PHP 8.1+ compatibility: ensure get_name() returns string
+        $product_name = $product->get_name();
+        $product_name = $product_name !== null ? (string) $product_name : '';
+        $xml .= '            <g:title>' . $this->cleanXmlContent($product_name) . '</g:title>' . "\n";
+        
+        // PHP 8.1+ compatibility: ensure get_description() returns string before wp_strip_all_tags
+        $product_description = $product->get_description();
+        $product_description = $product_description !== null ? (string) $product_description : '';
+        $product_description = !empty($product_description) ? wp_strip_all_tags($product_description) : '';
+        $xml .= '            <g:description>' . $this->cleanXmlContent($product_description) . '</g:description>' . "\n";
+        
+        // PHP 8.1+ compatibility: ensure get_permalink() returns string
+        $product_permalink = $product->get_permalink();
+        $product_permalink = $product_permalink !== null && $product_permalink !== false ? (string) $product_permalink : '';
+        $xml .= '            <g:link>' . esc_url($product_permalink) . '</g:link>' . "\n";
         
         // Image link
         $image_id = $product->get_image_id();
         if ($image_id) {
             $image_url = wp_get_attachment_url($image_id);
-            $xml .= '            <g:image_link>' . esc_url($image_url) . '</g:image_link>' . "\n";
+            // PHP 8.1+ compatibility: ensure image_url is not null
+            if ($image_url !== null && $image_url !== false) {
+                $xml .= '            <g:image_link>' . esc_url($image_url) . '</g:image_link>' . "\n";
+            }
         }
         
         // Price
         $price = $product->get_price();
-        if ($price) {
+        if ($price !== null && $price !== false && $price !== '') {
             $currency = get_woocommerce_currency();
-            $xml .= '            <g:price>' . esc_html($price . ' ' . $currency) . '</g:price>' . "\n";
+            // PHP 8.1+ compatibility: ensure currency is string
+            $currency = $currency !== null && $currency !== false ? (string) $currency : '';
+            $price_str = $price !== null ? (string) $price : '';
+            $xml .= '            <g:price>' . esc_html($price_str . ' ' . $currency) . '</g:price>' . "\n";
         }
         
         // Sale price
         if ($product->is_on_sale()) {
             $sale_price = $product->get_sale_price();
-            if ($sale_price) {
+            if ($sale_price !== null && $sale_price !== false && $sale_price !== '') {
                 $currency = get_woocommerce_currency();
-                $xml .= '            <g:sale_price>' . esc_html($sale_price . ' ' . $currency) . '</g:sale_price>' . "\n";
+                // PHP 8.1+ compatibility: ensure currency is string
+                $currency = $currency !== null && $currency !== false ? (string) $currency : '';
+                $sale_price_str = $sale_price !== null ? (string) $sale_price : '';
+                $xml .= '            <g:sale_price>' . esc_html($sale_price_str . ' ' . $currency) . '</g:sale_price>' . "\n";
             }
         }
         
         // Availability
         $availability = $product->is_in_stock() ? 'in_stock' : 'out_of_stock';
+        // PHP 8.1+ compatibility: ensure availability is string
+        $availability = (string) $availability;
         $xml .= '            <g:availability>' . esc_html($availability) . '</g:availability>' . "\n";
         
         // Condition
@@ -151,7 +188,8 @@ class GoogleProductsXml
         $gallery_ids = $product->get_gallery_image_ids();
         foreach ($gallery_ids as $gallery_id) {
             $gallery_url = wp_get_attachment_url($gallery_id);
-            if ($gallery_url) {
+            // PHP 8.1+ compatibility: ensure gallery_url is not null
+            if ($gallery_url !== null && $gallery_url !== false) {
                 $xml .= '            <g:additional_image_link>' . esc_url($gallery_url) . '</g:additional_image_link>' . "\n";
             }
         }
@@ -354,15 +392,28 @@ class GoogleProductsXml
      */
     private function cleanXmlContent($content)
     {
+        // PHP 7.4 & 8+ compatibility: ensure $content is a string
+        if ($content === null || $content === false) {
+            return '';
+        }
+        
+        // Convert to string if not already
+        $content = (string) $content;
+        
+        // Empty string check
         if (empty($content)) {
             return '';
         }
         
         // HTML entities'leri decode et
-        $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $decoded = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $content = $decoded !== false ? $decoded : $content;
         
-        // HTML taglarını temizle
+        // HTML taglarını temizle - ensure content is string before wp_strip_all_tags
         $content = wp_strip_all_tags($content);
+        
+        // PHP 8.1+ compatibility: ensure $content is still a string after processing
+        $content = $content !== null && $content !== false ? (string) $content : '';
         
         // XML'de sorun çıkarabilecek karakterleri escape et
         $content = str_replace(

@@ -136,13 +136,28 @@ class CheckoutForm extends WC_Payment_Gateway
     {
         try {
             $this->order = wc_get_order($order_id);
+            $this->order->add_order_note(
+                __('Order initialized via iyzico Checkout.', 'iyzico-woocommerce'),
+                0,
+                true
+            );
             $formType = $this->checkoutSettings->findByKey('form_class');
 
             if ($formType === 'redirect') {
-                $this->order->add_order_note(__(
-                    "This order will be processed on the iyzico payment page.",
-                    "iyzico-woocommerce"
-                ));
+                $this->order->add_order_note(
+                    __(
+                        'This order will be processed on the iyzico payment page.',
+                        'iyzico-woocommerce'
+                    )
+                );
+                $this->order->add_order_note(
+                    __(
+                        'Customer was redirected to iyzico hosted payment page (redirect flow).',
+                        'iyzico-woocommerce'
+                    ),
+                    0,
+                    true
+                );
                 $checkoutFormInitialize = $this->create_payment($order_id);
                 $paymentPageUrl = $checkoutFormInitialize->getPaymentPageUrl();
 
@@ -261,6 +276,7 @@ class CheckoutForm extends WC_Payment_Gateway
     public function checkout_form($orderId)
     {
         $checkoutFormInitialize = $this->create_payment($orderId);
+        $this->checkoutView->setOrderId($orderId);
         $this->checkoutView->renderCheckoutForm($checkoutFormInitialize);
     }
 

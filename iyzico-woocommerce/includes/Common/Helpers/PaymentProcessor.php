@@ -182,6 +182,40 @@ class PaymentProcessor
             return;
         }
 
+        // Status change preview note
+        $currentStatus = $order->get_status();
+        $targetStatus = $currentStatus;
+
+        $paymentStatus = strtoupper($checkoutFormResult->getPaymentStatus());
+        $status = strtoupper($checkoutFormResult->getStatus());
+
+        if ($paymentStatus === 'SUCCESS' && $status === 'SUCCESS') {
+            $settingsOrderStatus = $this->checkoutSettings->findByKey('order_status');
+            if ($settingsOrderStatus !== 'default' && !empty($settingsOrderStatus)) {
+                $targetStatus = $settingsOrderStatus;
+            } else {
+                $targetStatus = 'processing';
+            }
+        } elseif ($paymentStatus === 'INIT_BANK_TRANSFER' && $status === 'SUCCESS') {
+            $targetStatus = 'on-hold';
+        } elseif ($paymentStatus === 'PENDING_CREDIT' && $status === 'SUCCESS') {
+            $targetStatus = 'on-hold';
+        }
+
+        if ($targetStatus !== $currentStatus) {
+            $fromName = wc_get_order_status_name($currentStatus);
+            $toName = wc_get_order_status_name($targetStatus);
+            $statusMessage = sprintf(
+                __(
+                    'Order status will be changed from %1$s to %2$s by iyzico payment result.',
+                    'iyzico-woocommerce'
+                ),
+                $fromName,
+                $toName
+            );
+            $order->add_order_note($statusMessage, 0, false);
+        }
+
         $message = "Payment ID: " . $checkoutFormResult->getPaymentId() . " Conversation ID: " . $checkoutFormResult->getConversationId();
         $order->add_order_note($message, 0, true);
 

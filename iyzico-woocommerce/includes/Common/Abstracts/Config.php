@@ -51,7 +51,7 @@ abstract class Config
                     ),
                     'icon' => PLUGIN_ASSETS_DIR_URL.'/images/cards_v2.png',
                     'success_status' => 'processing',
-                    'overlay_script' => 'left',
+                    'overlay_script' => 'bottomLeft',
                     'form_class' => 'popup',
                     'secret_key' => '',
                     'api_key' => '',

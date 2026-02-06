@@ -91,10 +91,12 @@ class CheckoutSettings extends Config
                 'title' => __('Buyer Protection - Logo', 'iyzico-woocommerce'),
                 'type' => 'select',
                 'required' => false,
-                'default' => 'left',
+                'default' => 'bottomLeft',
                 'options' => [
-                    'bottomLeft' => __('Left', 'iyzico-woocommerce'),
-                    'bottomRight' => __('Right', 'iyzico-woocommerce'),
+                    'bottomLeft' => __('Bottom Left + Product Detail', 'iyzico-woocommerce'),
+                    'bottomRight' => __('Bottom Right + Product Detail', 'iyzico-woocommerce'),
+                    'onlyOverlayScript' => __('Only Overlay Script', 'iyzico-woocommerce'),
+                    'onlyProductDetailScript' => __('Only Product Detail Script', 'iyzico-woocommerce'),
                     'hide' => __('Hide', 'iyzico-woocommerce')
                 ]
             ],

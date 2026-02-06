@@ -7,6 +7,9 @@ class PriceHelper
 
     public function priceParser($price)
     {
+        // PHP 8.1+ compatibility: ensure $price is a string
+        $price = $price ?? '';
+        
         if (strpos($price, ".") === false) {
             return $price.".0";
         }

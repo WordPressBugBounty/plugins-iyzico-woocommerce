@@ -11,10 +11,23 @@ class CheckoutView
     private const CHECKOUT_FORM_ID = 'iyzipay-checkout-form';
 
     private CheckoutSettings $checkoutSettings;
+    /**
+     * @var int
+     */
+    private $orderId = 0;
 
     public function __construct()
     {
         $this->checkoutSettings = new CheckoutSettings();
+    }
+
+    /**
+     * @param int $orderId
+     * @return void
+     */
+    public function setOrderId($orderId): void
+    {
+        $this->orderId = (int) $orderId;
     }
 
     public function renderCheckoutForm(CheckoutFormInitialize $checkoutFormInitialize): void
@@ -63,13 +76,43 @@ class CheckoutView
      */
     private function renderUiControlScript(): void
     {
+        $ajaxUrl = admin_url('admin-ajax.php');
+        $nonce   = wp_create_nonce('iyzico_iframe_loaded');
         ?>
         <script type="text/javascript">
+            var iyzicoOrderId = <?php echo (int) $this->orderId; ?>;
+            var iyzicoIframeAjaxUrl = "<?php echo esc_url($ajaxUrl); ?>";
+            var iyzicoIframeNonce = "<?php echo esc_js($nonce); ?>";
+
+            var iyzicoNotifyIframeLoaded = function () {
+                if (!iyzicoOrderId || !iyzicoIframeAjaxUrl) {
+                    return;
+                }
+                if (window.iyzicoIframeLoadedNotified) {
+                    return;
+                }
+                window.iyzicoIframeLoadedNotified = true;
+
+                try {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', iyzicoIframeAjaxUrl, true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    xhr.send(
+                        'action=iyzico_iframe_loaded'
+                        + '&order_id=' + encodeURIComponent(iyzicoOrderId)
+                        + '&nonce=' + encodeURIComponent(iyzicoIframeNonce)
+                    );
+                } catch (e) {
+                    // sessizce yut
+                }
+            };
+
             var checkIyziInit = function () {
                 if (typeof iyziInit !== 'undefined') {
                     document.getElementById('<?php echo esc_js(self::LOADING_ID); ?>').style.display = 'none';
                     document.getElementById('<?php echo esc_js(self::INFO_BOX_ID); ?>').style.display = 'block';
                     document.getElementById('<?php echo esc_js(self::CHECKOUT_FORM_ID); ?>').style.display = 'block';
+                    iyzicoNotifyIframeLoaded();
                     return;
                 }
                 // Henüz yüklenmediyse tekrar dene

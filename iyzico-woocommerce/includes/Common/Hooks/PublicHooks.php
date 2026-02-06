@@ -40,10 +40,42 @@ class PublicHooks
             $this->getBuyerProtection()->enqueue_iyzico_overlay_script();
         });
 
-        // Add buyer protection div for product detail pages
-        add_action('woocommerce_after_add_to_cart_button', function () {
+        // Add buyer protection div for product detail pages woocommerce_after_add_to_cart_form
+        add_action('woocommerce_after_add_to_cart_form', function () {
             $this->getBuyerProtection()->add_product_detail_div();
         });
+
+        add_action('wp_ajax_iyzico_iframe_loaded', [$this, 'handleIframeLoaded']);
+        add_action('wp_ajax_nopriv_iyzico_iframe_loaded', [$this, 'handleIframeLoaded']);
+    }
+
+    public function handleIframeLoaded()
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce, 'iyzico_iframe_loaded')) {
+            wp_die();
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $orderId = isset($_POST['order_id']) ? (int) $_POST['order_id'] : 0;
+        if ($orderId <= 0) {
+            wp_die();
+        }
+
+        $order = wc_get_order($orderId);
+        if ($order) {
+            $order->add_order_note(
+                __(
+                    'iyzico Checkout iframe fully loaded in customer browser (iyziInit detected).',
+                    'iyzico-woocommerce'
+                ),
+                0,
+                true
+            );
+        }
+
+        wp_die();
     }
 
     private function getWebhookHelper()
